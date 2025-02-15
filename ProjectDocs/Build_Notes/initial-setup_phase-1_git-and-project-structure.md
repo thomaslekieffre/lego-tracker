@@ -23,9 +23,9 @@ Mettre en place la structure initiale du projet et configurer Git avec les bonne
 1. Configuration Git
 
    - [x] Création du .gitignore
-   - [ ] Initialisation du repo
-   - [ ] Configuration des branches (main, dev)
-   - [ ] Configuration des hooks Git
+   - [x] Initialisation du repo
+   - [x] Configuration des branches (main, dev)
+   - [x] Configuration des hooks Git
 
 2. Structure du Projet
 
@@ -36,7 +36,7 @@ Mettre en place la structure initiale du projet et configurer Git avec les bonne
 
 3. Sécurité
 
-   - [ ] Configuration des variables d'environnement
+   - [x] Configuration des variables d'environnement
    - [ ] Mise en place des secrets GitHub
    - [ ] Configuration des permissions
 
@@ -52,4 +52,8 @@ Mettre en place la structure initiale du projet et configurer Git avec les bonne
 - ✅ Création de la structure de dossiers
 - ✅ Configuration des outils de développement
 - ✅ Mise en place du .gitignore
-- 📝 Documentation initiale créée
+- ✅ Documentation initiale créée
+- ✅ Initialisation de Git avec branches main et dev
+- ✅ Configuration de Husky et lint-staged
+- ✅ Mise à jour des scripts package.json
+- 📝 Prochaine étape : Configuration GitHub et CI/CD
