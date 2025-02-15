@@ -1,0 +1,163 @@
+# **Key Principles**
+
+## **Code Quality & Style**
+
+- Écrire du code **concis, maintenable** et **très fortement typé** en **TypeScript**.
+- Adopter une approche **fonctionnelle et déclarative**, éviter la **POO et les classes**.
+- Limiter les fichiers à **150 lignes max**, refactoriser en modules plus petits si nécessaire.
+- **Itérer et modulariser** au lieu de dupliquer le code.
+- Utiliser des **noms de variables descriptifs et sémantiques**, avec des verbes auxiliaires (`isLoading`, `hasError`).
+- Nommer les **fichiers et dossiers** en **minuscules avec des tirets** (`components/user-stats`).
+- Privilégier les **exports nommés** pour les composants.
+- Appliquer la règle **RORO (Receive an Object, Return an Object)** pour les paramètres et retours de fonctions.
+- Respecter la règle **DRY (Don't Repeat Yourself)** en permanence.
+- **Faire des revues de code régulières** et organiser des sessions de **refactoring**.
+- Optimiser les **Web Vitals** (`LCP`, `CLS`, `FID`) pour des **performances optimales**.
+
+---
+
+## **Gestion des Build Notes**
+
+### **Emplacement & Nom des Fichiers**
+
+- **Dossier dédié :** `/ProjectDocs/Build_Notes/`
+- **Convention de nommage :**
+
+  ```
+  build-title_phase-#_task-group-name.md
+  ```
+
+  - `<build-title>` : décrit la tâche principale du build.
+  - `<phase-#>` : indique le numéro de phase.
+  - `<task-group-name>` : nom du groupe de tâches.
+
+- **Exemple :**
+  ```
+  supabase-schema-standardization_phase-1_preparation-and-code-analysis.md
+  ```
+
+### **Structure du Contenu**
+
+1. **Task Objective** → Objectif principal du build.
+2. **Current State Assessment** → État actuel du projet.
+3. **Future State Goal** → État souhaité après le build.
+4. **Implementation Plan** :
+   - Liste numérotée avec des tâches à cocher ✅.
+   - **Ne jamais supprimer** une tâche obsolète → **la barrer**.
+   - Ajouter des **nouvelles tâches** si nécessaire.
+5. **Updates & Changes** :
+   - Noter chaque **changement majeur** ou difficulté rencontrée.
+   - Compléter au fur et à mesure **jusqu’à la finalisation**.
+
+### **Quand Mettre à Jour ?**
+
+- **Avant de commencer** : définir l’objectif et le plan initial.
+- **Pendant l’exécution** : noter les obstacles et mises à jour.
+- **À la fin** : résumer ce qui a été fait et vérifier la conformité avec l’objectif initial.
+
+### **Archivage des Build Notes**
+
+- **Une fois terminé** : déplacer dans `/ProjectDocs/Build_Notes/completed/`
+- **Si obsolète** : archiver dans `/ProjectDocs/Build_Notes/archived/`
+
+---
+
+## **Gestion des Context Files**
+
+### **`projectContext.md` (Contexte Principal)**
+
+- Situé dans `/ProjectDocs/contexts/`
+- Définit la **portée du projet**, les exigences et les principes de conception.
+- **Ne pas modifier**, sauf en cas de **changement majeur validé**.
+
+### **Context Files Supplémentaires**
+
+- Exemples : `uiContext.md`, `featureAContext.md`
+- Contiennent des **spécifications détaillées** sur certaines fonctionnalités.
+- **Stables**, modifiables uniquement si un **changement officiel** est approuvé.
+- **Doivent être consultés régulièrement** pour assurer la cohérence du développement.
+
+### **Gestion des Modifications**
+
+- **Chaque mise à jour** des context files doit être **documentée dans les Build Notes**.
+- Expliquer le **raisonnement derrière chaque modification** pour garder une trace claire.
+
+---
+
+## **Stack & Framework Conventions**
+
+### **Next.js 15+**
+
+- Exploiter **App Router, React Server Components (RSC), SSR**.
+- **Limiter l'utilisation de `use client`**, privilégier le serveur.
+- Adopter une approche **mobile-first & responsive**.
+- Structurer l'application comme une **PWA (Progressive Web App)** avec **capacités hors-ligne**.
+
+### **Gestion de l'État & UI**
+
+- **Zustand** → gestion d’état **côté client**.
+- **ShadCN UI** → installation et gestion :
+
+  ```sh
+  npx shadcn@latest init -d
+  npx shadcn@latest add {component}
+  ```
+
+  shadcn@latest pas shadcn-ui@latest
+
+- **TailwindCSS** → framework CSS principal.
+
+### **Base de Données & Authentification**
+
+- **Supabase** → base de données.
+- **Clerk** → gestionnaire d’authentification.
+- Utiliser **RLS (Row Level Security)** pour la gestion des permissions.
+- Structurer les **données pour optimiser** les requêtes et éviter les duplications.
+
+### **Monorepo & Outils**
+
+- **Structure Monorepo** :
+  - Code partagé → `/packages/`
+  - Code spécifique → `/app/`
+- Automatiser avec **`Taskfile.yml`**.
+- Stocker les **variables d’environnement dans `.env`**.
+- Utiliser **`pnpm`** comme gestionnaire de paquets.
+
+---
+
+## **Rules pour les Commits Fréquents et Bien Faits** 🚀
+
+Un bon commit, c’est :  
+✅ **Clair** → Décrit précisément la modification.  
+✅ **Petit** → Modifie un seul aspect du code.  
+✅ **Atomique** → Peut être rollback sans souci.
+
+### **Règles Générales**
+
+1. **Commits fréquents**
+2. **Messages clairs et concis** (pas de _"fix bug"_, _"update"_)
+3. **Convention des commits** :
+   - `feat:` → Nouvelle feature
+   - `fix:` → Correction de bug
+   - `refactor:` → Amélioration du code sans changement fonctionnel
+   - `chore:` → Maintenance (mise à jour deps, nettoyage, etc.)
+   - `test:` → Ajout/modif de tests
+   - `docs:` → Mise à jour de la documentation
+   - `style:` → Formatage, indentation
+
+### **Gestion des Branches**
+
+- `main` → Stable, pas de commit direct.
+- `dev` → Branche de développement.
+
+### **Quand Commiter ?**
+
+- A la fin d'une grosse modification.
+- A la fin d'une petite tâche de la roadmap.
+- Quand on a fini une feature.
+- Quand on a fini une refactorisation.
+- Quand on a fini une correction de bug.
+- Quand on a fini une mise à jour de la documentation.
+- Quand on a fini une mise à jour de la configuration.
+
+Respectes ses règles sans les changer sous aucun prétexte.

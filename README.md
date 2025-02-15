@@ -1,4 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lego Tracker
+
+Application web permettant aux collectionneurs de Lego de gérer leur collection, suivre l'état de leurs sets et gérer les pièces manquantes.
+
+## Fonctionnalités
+
+- 🎯 Suivi des sets Lego (montés, démontés, incomplets)
+- 📦 Gestion des pièces manquantes
+- 🔔 Notifications de disponibilité des pièces
+- 📊 Statistiques de collection
+- 👥 Fonctionnalités communautaires
+
+## Stack Technique
+
+- **Frontend** : Next.js 15+, TypeScript, ShadcnUI, TailwindCSS
+- **Backend** : Supabase (PostgreSQL)
+- **Auth** : Clerk
+- **API** : Rebrickable
+- **State** : Zustand
+- **Testing** : Jest, React Testing Library
+
+## Prérequis
+
+- Node.js 18+
+- pnpm
+- Compte Supabase
+- Compte Clerk
+- Clé API Rebrickable
+
+## Installation
+
+1. Cloner le repo
+
+```bash
+git clone [repo-url]
+cd lego-tracker
+```
+
+2. Installer les dépendances
+
+```bash
+pnpm install
+```
+
+3. Configurer les variables d'environnement
+
+```bash
+cp .env.example .env
+# Remplir les variables dans .env
+```
+
+4. Lancer le serveur de développement
+
+```bash
+pnpm dev
+```
+
+## Structure du Projet
+
+```
+lego-tracker/
+├── src/
+│   ├── app/
+│   │   ├── components/    # Composants réutilisables
+│   │   ├── features/      # Fonctionnalités principales
+│   │   ├── hooks/         # Hooks personnalisés
+│   │   ├── layouts/       # Layouts de l'application
+│   │   ├── lib/          # Utilitaires et configurations
+│   │   └── styles/       # Styles globaux
+│   └── packages/         # Packages partagés
+├── ProjectDocs/
+│   ├── Build_Notes/      # Notes de build
+│   └── contexts/         # Contextes du projet
+└── public/              # Assets statiques
+```
+
+## Contribution
+
+1. Créer une branche (`git checkout -b feature/amazing-feature`)
+2. Commit les changements (`git commit -m 'feat: add amazing feature'`)
+3. Push la branche (`git push origin feature/amazing-feature`)
+4. Ouvrir une Pull Request
+
+## Licence
+
+MIT
 
 ## Getting Started
 
