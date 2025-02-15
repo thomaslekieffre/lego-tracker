@@ -37,13 +37,6 @@ Mettre en place la structure initiale du projet et configurer Git avec les bonne
 3. Sécurité
 
    - [x] Configuration des variables d'environnement
-   - [ ] Mise en place des secrets GitHub
-   - [ ] Configuration des permissions
-
-4. CI/CD Initial
-   - [ ] Configuration de base GitHub Actions
-   - [ ] Mise en place des checks de PR
-   - [ ] Configuration du linting automatique
 
 ## Updates & Changes
 
@@ -56,4 +49,3 @@ Mettre en place la structure initiale du projet et configurer Git avec les bonne
 - ✅ Initialisation de Git avec branches main et dev
 - ✅ Configuration de Husky et lint-staged
 - ✅ Mise à jour des scripts package.json
-- 📝 Prochaine étape : Configuration GitHub et CI/CD
