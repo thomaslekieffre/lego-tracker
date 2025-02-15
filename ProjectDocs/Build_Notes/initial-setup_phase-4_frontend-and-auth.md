@@ -8,9 +8,9 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 
 - ✅ Backend Supabase configuré
 - ✅ Types et schémas définis
-- ⏳ Pas d'interface utilisateur
+- ✅ Interface utilisateur de base
 - ✅ Configuration de base de l'authentification
-- ⏳ Pas de protection des routes complète
+- ⏳ Protection des routes en cours
 
 ## Future State Goal
 
@@ -27,17 +27,18 @@ Mettre en place les fondations du frontend et le système d'authentification ave
    - ✅ Installation des dépendances Clerk
    - ✅ Configuration des variables d'environnement
    - ✅ Mise en place du provider Clerk
-   - Configuration des callbacks OAuth
+   - ✅ Configuration des callbacks OAuth
 
 2. Layout & UI de Base
 
-   - [ ] Layout principal de l'application
-     - [ ] Header avec état de connexion
-     - [ ] Navigation principale
-     - [ ] Sidebar responsive
-   - [ ] Thème ShadcnUI personnalisé
-   - [ ] Composants de base
-     - [ ] Boutons
+   - ✅ Layout principal de l'application
+     - ✅ Header avec état de connexion
+     - ✅ Navigation principale
+     - ✅ Sidebar responsive
+   - ✅ Thème ShadcnUI personnalisé
+   - ✅ Composants de base
+     - ✅ Boutons
+     - ✅ Landing page
      - [ ] Formulaires
      - [ ] Cards
      - [ ] Modals
@@ -53,6 +54,7 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 4. Protection & Middleware
 
    - ✅ Middleware d'authentification
+   - ✅ Configuration next.config.js
    - [ ] HOC de protection des routes
    - [ ] Redirection intelligente
    - [ ] Gestion des sessions
@@ -66,10 +68,15 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 
 ## Updates & Changes
 
-### 16/02/2024
+### 15/02/2024
 
 - 📝 Création du build note
 - ✨ Configuration initiale de Clerk
 - 🔒 Mise en place du middleware d'authentification
 - 📱 Création des pages de connexion et d'inscription
-- 🎯 Prochaine action : Création du layout principal
+- 🎨 Création du layout principal avec sidebar responsive
+- 🌙 Ajout du thème sombre/clair
+- 🎨 Création de la landing page avec animations
+- ✨ Ajout des effets de transition et animations Framer Motion
+- 🖼️ Configuration des images externes dans next.config.js
+- 🎯 Prochaine action : Développement des formulaires et cards

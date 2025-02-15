@@ -1,4 +1,8 @@
+'use client';
+
 import Link from 'next/link';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
@@ -10,6 +14,40 @@ const features = [
   'Export de données',
   'Support premium',
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+    },
+  },
+};
+
+const floatingAnimation = {
+  y: [-10, 10],
+  transition: {
+    y: {
+      duration: 2,
+      repeat: Infinity,
+      repeatType: 'reverse',
+      ease: 'easeInOut',
+    },
+  },
+};
 
 export default function Home(): React.ReactElement {
   return (
@@ -33,31 +71,84 @@ export default function Home(): React.ReactElement {
 
           <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 lg:py-40">
             <div className="mx-auto max-w-2xl text-center">
-              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-                Gérez votre collection Lego comme un pro
-              </h1>
-              <p className="mt-6 text-lg leading-8 text-muted-foreground">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <h1 className="text-4xl font-bold tracking-tight sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-[#9089fc]">
+                  Gérez votre collection Lego comme un pro
+                </h1>
+              </motion.div>
+
+              <motion.p
+                className="mt-6 text-lg leading-8 text-muted-foreground"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
                 Organisez, suivez et optimisez votre collection de Lego. Ne perdez plus jamais une
                 pièce et profitez pleinement de votre passion.
-              </p>
-              <div className="mt-10 flex items-center justify-center gap-x-6">
-                <Button asChild size="lg">
+              </motion.p>
+
+              <motion.div
+                className="mt-10 flex items-center justify-center gap-x-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <Button asChild size="lg" className="gap-2">
                   <Link href="/sign-up">
                     Commencer gratuitement
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
-                <Button variant="outline" size="lg" asChild>
-                  <Link href="/sign-in">Connexion</Link>
-                </Button>
-              </div>
+              </motion.div>
+
+              {/* Image flottante */}
+              <motion.div
+                className="mt-16 relative z-10"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 100,
+                  delay: 0.6,
+                }}
+              >
+                <div className="relative w-full max-w-lg mx-auto">
+                  {/* Cercle décoratif */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-[#9089fc] rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt" />
+
+                  {/* Container de l'image avec effet de profondeur */}
+                  <motion.div className="relative" animate={floatingAnimation}>
+                    <div className="absolute -inset-px bg-gradient-to-r from-primary to-[#9089fc] rounded-lg" />
+                    <div className="relative bg-background rounded-lg p-1">
+                      <Image
+                        src="https://images.unsplash.com/photo-1562331769-82a47d603c57?q=80&w=1933&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="Collection de Lego colorés"
+                        width={800}
+                        height={600}
+                        className="rounded-lg shadow-2xl w-full h-auto transform transition-transform duration-500 hover:scale-[1.02]"
+                        priority
+                      />
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
 
         {/* Features Section */}
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl sm:text-center">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 py-20">
+          <motion.div
+            className="mx-auto max-w-2xl text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Tout ce qu'il vous faut
             </h2>
@@ -65,18 +156,24 @@ export default function Home(): React.ReactElement {
               Une suite complète d'outils pour gérer votre collection Lego de manière
               professionnelle.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+          <motion.div
+            className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
             <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
               {features.map((feature) => (
-                <div key={feature} className="flex gap-x-3">
+                <motion.div key={feature} className="flex gap-x-3" variants={itemVariants}>
                   <CheckCircle2 className="h-5 w-5 flex-none text-primary" aria-hidden="true" />
                   <span className="text-sm leading-6">{feature}</span>
-                </div>
+                </motion.div>
               ))}
             </dl>
-          </div>
+          </motion.div>
         </div>
       </main>
 

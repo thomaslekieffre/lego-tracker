@@ -75,9 +75,6 @@ Mettre en place la base de données Supabase et configurer les tables nécessair
 
 - 📝 Création du build note
 - 🎯 Prochaine action : Création du projet Supabase
-
-### 16/02/2024
-
 - ✨ Création du schéma initial de la base de données
 - 🔒 Mise en place des politiques RLS
 - 🔄 Création des triggers et fonctions
