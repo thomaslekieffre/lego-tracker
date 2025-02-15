@@ -25,9 +25,9 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 1. Configuration Clerk
 
    - ✅ Installation des dépendances Clerk
-   - [ ] Configuration des variables d'environnement
+   - ✅ Configuration des variables d'environnement
    - ✅ Mise en place du provider Clerk
-   - [ ] Configuration des callbacks OAuth
+   - Configuration des callbacks OAuth
 
 2. Layout & UI de Base
 
@@ -72,4 +72,4 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 - ✨ Configuration initiale de Clerk
 - 🔒 Mise en place du middleware d'authentification
 - 📱 Création des pages de connexion et d'inscription
-- 🎯 Prochaine action : Configuration des variables d'environnement Clerk
+- 🎯 Prochaine action : Création du layout principal
