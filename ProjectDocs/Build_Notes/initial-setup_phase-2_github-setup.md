@@ -10,6 +10,7 @@ Publier le projet sur GitHub et mettre en place les workflows CI/CD.
 - ✅ Branches main et dev créées
 - ✅ Hooks Git configurés
 - ✅ Structure du projet en place
+- ✅ Code publié sur GitHub
 
 ## Future State Goal
 
@@ -22,9 +23,9 @@ Publier le projet sur GitHub et mettre en place les workflows CI/CD.
 
 1. Configuration du Repository GitHub
 
-   - [ ] Création du repository sur GitHub
-   - [ ] Configuration du README.md
-   - [ ] Ajout des templates d'issues et PR
+   - [x] Création du repository sur GitHub
+   - [x] Configuration du README.md
+   - [x] Ajout des templates d'issues et PR
    - [ ] Configuration des labels
 
 2. Protection des Branches
@@ -35,7 +36,7 @@ Publier le projet sur GitHub et mettre en place les workflows CI/CD.
 
 3. GitHub Actions
 
-   - [ ] Workflow de CI
+   - [x] Workflow de CI
      - Linting
      - Type checking
      - Tests
@@ -45,15 +46,19 @@ Publier le projet sur GitHub et mettre en place les workflows CI/CD.
    - [ ] Dependabot setup
 
 4. Documentation GitHub
-   - [ ] CONTRIBUTING.md
+   - [x] CONTRIBUTING.md
    - [ ] SECURITY.md
    - [ ] CODE_OF_CONDUCT.md
-   - [ ] PULL_REQUEST_TEMPLATE.md
-   - [ ] ISSUE_TEMPLATE/
+   - [x] PULL_REQUEST_TEMPLATE.md
+   - [x] ISSUE_TEMPLATE/
 
 ## Updates & Changes
 
 ### 15/02/2024
 
-- 📝 Création du build note
-- 🎯 Prochaine action : Création du repository GitHub
+- ✅ Création du build note
+- ✅ Création du repository GitHub
+- ✅ Configuration des templates GitHub
+- ✅ Mise en place du workflow CI
+- ✅ Push du code sur GitHub
+- 📝 Prochaine action : Configuration des protections de branches
