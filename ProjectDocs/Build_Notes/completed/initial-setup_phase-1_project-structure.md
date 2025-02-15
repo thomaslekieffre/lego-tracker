@@ -48,9 +48,9 @@ Mettre en place la structure initiale du projet Lego Tracker en suivant les conv
 
 2. Configuration technique
 
-   - [] Setup de Supabase
-   - [] Intégration de l'API Rebrickable
-   - [] Configuration de Clerk pour l'authentification
+   - [x] Setup de Supabase
+   - [x] Intégration de l'API Rebrickable
+   - [x] Configuration de Clerk pour l'authentification
    - [x] Setup de ShadcnUI
 
 3. Documentation initiale
