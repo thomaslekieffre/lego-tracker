@@ -9,8 +9,8 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 - ✅ Backend Supabase configuré
 - ✅ Types et schémas définis
 - ⏳ Pas d'interface utilisateur
-- ⏳ Pas d'authentification
-- ⏳ Pas de protection des routes
+- ✅ Configuration de base de l'authentification
+- ⏳ Pas de protection des routes complète
 
 ## Future State Goal
 
@@ -24,9 +24,9 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 
 1. Configuration Clerk
 
-   - [ ] Installation des dépendances Clerk
+   - ✅ Installation des dépendances Clerk
    - [ ] Configuration des variables d'environnement
-   - [ ] Mise en place du provider Clerk
+   - ✅ Mise en place du provider Clerk
    - [ ] Configuration des callbacks OAuth
 
 2. Layout & UI de Base
@@ -44,15 +44,15 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 
 3. Pages d'Authentification
 
-   - [ ] Page de connexion
-   - [ ] Page d'inscription
+   - ✅ Page de connexion
+   - ✅ Page d'inscription
    - [ ] Réinitialisation de mot de passe
    - [ ] Vérification d'email
    - [ ] Profil utilisateur
 
 4. Protection & Middleware
 
-   - [ ] Middleware d'authentification
+   - ✅ Middleware d'authentification
    - [ ] HOC de protection des routes
    - [ ] Redirection intelligente
    - [ ] Gestion des sessions
@@ -69,4 +69,7 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 ### 16/02/2024
 
 - 📝 Création du build note
-- 🎯 Prochaine action : Installation et configuration de Clerk
+- ✨ Configuration initiale de Clerk
+- 🔒 Mise en place du middleware d'authentification
+- 📱 Création des pages de connexion et d'inscription
+- 🎯 Prochaine action : Configuration des variables d'environnement Clerk
