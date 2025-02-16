@@ -3,8 +3,15 @@
 import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { RebrickableSet } from '@/types/rebrickable';
-import { LegoSetInsertSchema } from '@/schemas/database';
+import {
+  LegoSetInsertSchema,
+  LegoSetStatusSchema,
+  MissingPieceInsertSchema,
+  MissingPieceSchema,
+} from '@/schemas/database';
 import { randomUUID } from 'crypto';
+import { revalidatePath } from 'next/cache';
+import { rebrickableClient, RebrickablePart } from '@/lib/rebrickable';
 
 export async function addLegoSet(rebrickableSet: RebrickableSet): Promise<void> {
   const session = await auth();
@@ -75,6 +82,292 @@ export async function getUserLegoSets(): Promise<any[]> {
     return data;
   } catch (error) {
     console.error('Erreur lors de la récupération des sets:', error);
+    throw error;
+  }
+}
+
+export async function updateSetStatus(
+  setId: string,
+  status: 'mounted' | 'dismounted' | 'incomplete'
+): Promise<void> {
+  const session = await auth();
+  const userId = session.userId;
+
+  if (!userId) {
+    throw new Error('Utilisateur non authentifié');
+  }
+
+  try {
+    const validatedStatus = LegoSetStatusSchema.parse(status);
+
+    const { error } = await supabaseAdmin
+      .from('lego_sets')
+      .update({
+        status: validatedStatus,
+        last_modified: new Date().toISOString(),
+      })
+      .eq('id', setId)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Erreur Supabase:', error);
+      throw new Error('Erreur lors de la mise à jour du statut');
+    }
+
+    revalidatePath('/collection/[id]', 'page');
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour:', error);
+    throw error;
+  }
+}
+
+export async function updateSetNotes(setId: string, notes: string): Promise<void> {
+  const session = await auth();
+  const userId = session.userId;
+
+  if (!userId) {
+    throw new Error('Utilisateur non authentifié');
+  }
+
+  try {
+    const { error } = await supabaseAdmin
+      .from('lego_sets')
+      .update({
+        notes,
+        last_modified: new Date().toISOString(),
+      })
+      .eq('id', setId)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Erreur Supabase:', error);
+      throw new Error('Erreur lors de la mise à jour des notes');
+    }
+
+    revalidatePath('/collection/[id]', 'page');
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour:', error);
+    throw error;
+  }
+}
+
+export async function getMissingPieces(setId: string): Promise<any[]> {
+  const session = await auth();
+  const userId = session.userId;
+
+  if (!userId) {
+    throw new Error('Utilisateur non authentifié');
+  }
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('missing_pieces')
+      .select('*')
+      .eq('set_id', setId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Erreur Supabase:', error);
+      throw new Error('Erreur lors de la récupération des pièces manquantes');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des pièces:', error);
+    throw error;
+  }
+}
+
+export async function addMissingPiece(
+  setId: string,
+  piece: {
+    part_number: string;
+    color: string;
+    quantity: number;
+    status?: 'searching' | 'found' | 'ordered';
+    purchase_url?: string;
+    notes?: string;
+    price?: number;
+  }
+): Promise<void> {
+  const session = await auth();
+  const userId = session.userId;
+
+  if (!userId) {
+    throw new Error('Utilisateur non authentifié');
+  }
+
+  try {
+    // Vérifier que l'utilisateur possède bien le set
+    const { data: setData, error: setError } = await supabaseAdmin
+      .from('lego_sets')
+      .select('id')
+      .eq('id', setId)
+      .eq('user_id', userId)
+      .single();
+
+    if (setError || !setData) {
+      throw new Error('Set non trouvé ou non autorisé');
+    }
+
+    const newPiece = MissingPieceInsertSchema.parse({
+      id: randomUUID(),
+      set_id: setId,
+      part_number: piece.part_number,
+      color: piece.color,
+      quantity: piece.quantity,
+      status: piece.status || 'searching',
+      purchase_url: piece.purchase_url || null,
+      notes: piece.notes || null,
+      price: piece.price || null,
+    });
+
+    const { error } = await supabaseAdmin.from('missing_pieces').insert([newPiece]);
+
+    if (error) {
+      console.error('Erreur Supabase:', error);
+      throw new Error("Erreur lors de l'ajout de la pièce");
+    }
+
+    revalidatePath('/collection/[id]', 'page');
+  } catch (error) {
+    console.error("Erreur lors de l'ajout de la pièce:", error);
+    throw error;
+  }
+}
+
+export async function deleteMissingPiece(setId: string, pieceId: string): Promise<void> {
+  const session = await auth();
+  const userId = session.userId;
+
+  if (!userId) {
+    throw new Error('Utilisateur non authentifié');
+  }
+
+  try {
+    // Vérifier que l'utilisateur possède bien le set
+    const { data: setData, error: setError } = await supabaseAdmin
+      .from('lego_sets')
+      .select('id')
+      .eq('id', setId)
+      .eq('user_id', userId)
+      .single();
+
+    if (setError || !setData) {
+      throw new Error('Set non trouvé ou non autorisé');
+    }
+
+    // Récupérer la quantité de la pièce avant suppression
+    const { data: pieceData, error: pieceError } = await supabaseAdmin
+      .from('missing_pieces')
+      .select('quantity')
+      .eq('id', pieceId)
+      .eq('set_id', setId)
+      .single();
+
+    if (pieceError || !pieceData) {
+      throw new Error('Pièce non trouvée');
+    }
+
+    const { error } = await supabaseAdmin
+      .from('missing_pieces')
+      .delete()
+      .eq('id', pieceId)
+      .eq('set_id', setId);
+
+    if (error) {
+      console.error('Erreur Supabase:', error);
+      throw new Error('Erreur lors de la suppression de la pièce');
+    }
+
+    revalidatePath('/collection/[id]', 'page');
+  } catch (error) {
+    console.error('Erreur lors de la suppression de la pièce:', error);
+    throw error;
+  }
+}
+
+export async function updateMissingPieceStatus(
+  setId: string,
+  pieceId: string,
+  status: 'searching' | 'found' | 'ordered',
+  purchaseUrl?: string,
+  price?: number
+): Promise<void> {
+  const session = await auth();
+  const userId = session.userId;
+
+  if (!userId) {
+    throw new Error('Utilisateur non authentifié');
+  }
+
+  try {
+    // Vérifier que l'utilisateur possède bien le set
+    const { data: setData, error: setError } = await supabaseAdmin
+      .from('lego_sets')
+      .select('id')
+      .eq('id', setId)
+      .eq('user_id', userId)
+      .single();
+
+    if (setError || !setData) {
+      throw new Error('Set non trouvé ou non autorisé');
+    }
+
+    const updateData: Record<string, any> = {
+      status,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (purchaseUrl !== undefined) {
+      updateData.purchase_url = purchaseUrl;
+    }
+
+    if (price !== undefined) {
+      updateData.price = price;
+    }
+
+    const { error } = await supabaseAdmin
+      .from('missing_pieces')
+      .update(updateData)
+      .eq('id', pieceId)
+      .eq('set_id', setId);
+
+    if (error) {
+      console.error('Erreur Supabase:', error);
+      throw new Error('Erreur lors de la mise à jour du statut');
+    }
+
+    revalidatePath('/collection/[id]', 'page');
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du statut:', error);
+    throw error;
+  }
+}
+
+export async function searchParts(query: string): Promise<RebrickablePart[]> {
+  try {
+    return await rebrickableClient.searchParts(query);
+  } catch (error) {
+    console.error('Erreur lors de la recherche de pièces:', error);
+    throw error;
+  }
+}
+
+export async function getPartColors(partNum: string): Promise<any[]> {
+  try {
+    return await rebrickableClient.getPartColors(partNum);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des couleurs:', error);
+    throw error;
+  }
+}
+
+export async function getPartDetails(partNum: string) {
+  try {
+    return await rebrickableClient.getPartDetails(partNum);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des détails de la pièce:', error);
     throw error;
   }
 }
