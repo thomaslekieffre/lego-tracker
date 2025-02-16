@@ -7,7 +7,7 @@ export const PieceStatusSchema = z.enum(['searching', 'found', 'ordered']);
 
 // Base schemas
 export const UserSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1),
   email: z.string().email().min(3),
   subscription_tier: SubscriptionTierSchema,
   created_at: z.string().datetime(),
@@ -19,7 +19,7 @@ export const UserSchema = z.object({
 
 export const LegoSetSchema = z.object({
   id: z.string().uuid(),
-  user_id: z.string().uuid(),
+  user_id: z.string().min(1),
   rebrickable_id: z.string().min(1),
   name: z.string().min(1).max(255),
   set_number: z.string().min(1),
@@ -77,7 +77,7 @@ export const MissingPieceUpdateSchema = MissingPieceInsertSchema.partial().requi
 
 // Statistics schema
 export const UserStatisticsSchema = z.object({
-  user_id: z.string().uuid(),
+  user_id: z.string().min(1),
   total_sets: z.number().int().min(0),
   mounted_sets: z.number().int().min(0),
   dismounted_sets: z.number().int().min(0),

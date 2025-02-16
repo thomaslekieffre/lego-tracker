@@ -16,6 +16,7 @@ interface DatabaseTables {
   users: {
     Row: {
       id: string;
+      clerk_id: string;
       email: string;
       subscription_tier: SubscriptionTier;
       created_at: string;

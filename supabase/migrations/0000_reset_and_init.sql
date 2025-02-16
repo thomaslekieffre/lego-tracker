@@ -1,3 +1,14 @@
+-- Suppression des objets existants
+drop trigger if exists update_missing_pieces_count_trigger on missing_pieces;
+drop function if exists update_missing_pieces_count();
+drop view if exists user_statistics;
+drop table if exists missing_pieces;
+drop table if exists lego_sets;
+drop table if exists users;
+drop type if exists piece_status;
+drop type if exists lego_set_status;
+drop type if exists subscription_tier;
+
 -- Enable necessary extensions
 create extension if not exists "uuid-ossp";
 
@@ -124,6 +135,10 @@ create policy "Users can view own profile"
 create policy "Users can update own profile"
   on users for update
   using (auth.uid()::text = clerk_id);
+
+create policy "Service role can insert users"
+  on users for insert
+  with check (true);
 
 -- Lego sets policies
 create policy "Users can view own sets"
