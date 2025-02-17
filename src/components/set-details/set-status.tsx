@@ -13,6 +13,8 @@ import { Badge } from '@/components/ui/badge';
 import { LegoSet } from '@/schemas/database';
 import { updateSetStatus } from '@/app/collection/actions';
 import { useToast } from '@/components/ui/use-toast';
+import { useSetPreferences } from '@/stores/set-preferences';
+import { AnimatedContainer } from '@/components/ui/animated-container';
 
 const statusOptions = [
   { value: 'mounted', label: 'Monté', color: 'bg-green-500' },
@@ -27,11 +29,13 @@ type SetStatusProps = {
 export function SetStatus({ set }: SetStatusProps) {
   const [status, setStatus] = useState(set.status);
   const { toast } = useToast();
+  const { updateLastUsedStatus } = useSetPreferences();
 
   async function handleStatusChange(newStatus: typeof status) {
     try {
       await updateSetStatus(set.id, newStatus);
       setStatus(newStatus);
+      updateLastUsedStatus(set.id, newStatus);
       toast({
         title: 'Statut mis à jour',
         description: `Le set est maintenant ${statusOptions
@@ -56,11 +60,9 @@ export function SetStatus({ set }: SetStatusProps) {
         <SelectTrigger className="w-full">
           <SelectValue>
             <AnimatePresence mode="wait">
-              <motion.div
+              <AnimatedContainer
                 key={status}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
+                animation="animate-fade-in"
                 className="flex items-center gap-2"
               >
                 <Badge variant="secondary" className="relative px-4 py-1 flex items-center gap-2">
@@ -70,7 +72,7 @@ export function SetStatus({ set }: SetStatusProps) {
                   />
                   {currentStatus?.label}
                 </Badge>
-              </motion.div>
+              </AnimatedContainer>
             </AnimatePresence>
           </SelectValue>
         </SelectTrigger>

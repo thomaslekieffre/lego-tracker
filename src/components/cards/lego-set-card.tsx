@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Boxes, Puzzle } from 'lucide-react';
+import { LegoSetStatus } from '@/types/database';
 
 interface LegoSetCardProps {
   id: string;
@@ -20,8 +21,9 @@ interface LegoSetCardProps {
   setNumber: string;
   piecesCount: number;
   imageUrl?: string | null;
-  status: 'mounted' | 'dismounted' | 'incomplete';
+  status: LegoSetStatus;
   missingPiecesCount: number;
+  isSharedView?: boolean;
 }
 
 export function LegoSetCard({
@@ -32,6 +34,7 @@ export function LegoSetCard({
   imageUrl,
   status,
   missingPiecesCount,
+  isSharedView = false,
 }: LegoSetCardProps): React.ReactElement {
   const statusColor = {
     mounted: 'text-green-500',
@@ -47,6 +50,50 @@ export function LegoSetCard({
 
   const imageSrc = imageUrl && imageUrl.length > 0 ? imageUrl : '/placeholder-set.jpg';
 
+  const content = (
+    <Card className="overflow-hidden">
+      <CardHeader className="p-0">
+        <div className="relative aspect-[4/3] w-full">
+          <Image
+            src={imageSrc}
+            alt={name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
+      </CardHeader>
+      <CardContent className="p-4">
+        <CardTitle className="line-clamp-1">{name}</CardTitle>
+        <CardDescription className="mt-2 flex items-center justify-between">
+          <span>{setNumber}</span>
+          <span className={statusColor[status]}>{statusText[status]}</span>
+        </CardDescription>
+        <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Boxes className="h-4 w-4" />
+            <span>{piecesCount} pièces</span>
+          </div>
+          {missingPiecesCount > 0 && (
+            <div className="flex items-center gap-1 text-red-500">
+              <Puzzle className="h-4 w-4" />
+              <span>
+                {missingPiecesCount} manquante{missingPiecesCount > 1 ? 's' : ''}
+              </span>
+            </div>
+          )}
+        </div>
+      </CardContent>
+      {!isSharedView && (
+        <CardFooter className="p-4 pt-0">
+          <Button asChild className="w-full">
+            <Link href={`/collection/${id}`}>Voir les détails</Link>
+          </Button>
+        </CardFooter>
+      )}
+    </Card>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -54,45 +101,13 @@ export function LegoSetCard({
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
     >
-      <Card className="overflow-hidden">
-        <CardHeader className="p-0">
-          <div className="relative aspect-[4/3] w-full">
-            <Image
-              src={imageSrc}
-              alt={name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          </div>
-        </CardHeader>
-        <CardContent className="p-4">
-          <CardTitle className="line-clamp-1">{name}</CardTitle>
-          <CardDescription className="mt-2 flex items-center justify-between">
-            <span>{setNumber}</span>
-            <span className={statusColor[status]}>{statusText[status]}</span>
-          </CardDescription>
-          <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Boxes className="h-4 w-4" />
-              <span>{piecesCount} pièces</span>
-            </div>
-            {missingPiecesCount > 0 && (
-              <div className="flex items-center gap-1 text-red-500">
-                <Puzzle className="h-4 w-4" />
-                <span>
-                  {missingPiecesCount} manquante{missingPiecesCount > 1 ? 's' : ''}
-                </span>
-              </div>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="p-4 pt-0">
-          <Button asChild className="w-full">
-            <Link href={`/collection/${id}`}>Voir les détails</Link>
-          </Button>
-        </CardFooter>
-      </Card>
+      {isSharedView ? (
+        <div className="group relative overflow-hidden">{content}</div>
+      ) : (
+        <Link href={`/collection/${id}`} className="group relative overflow-hidden">
+          {content}
+        </Link>
+      )}
     </motion.div>
   );
 }

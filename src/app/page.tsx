@@ -10,9 +10,9 @@ const features = [
   'Gestion illimitée de sets Lego',
   'Suivi des pièces manquantes',
   'Statistiques détaillées',
-  'Synchronisation avec Rebrickable',
+  'Partage de collections',
   'Export de données',
-  'Support premium',
+  'Synchronisation avec Rebrickable',
 ];
 
 const containerVariants = {

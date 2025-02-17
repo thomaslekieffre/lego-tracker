@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { auth } from '@clerk/nextjs';
-import { supabaseAdmin } from '@/lib/supabase';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { LegoSetSchema } from '@/schemas/database';
 import { SetDetails } from '@/components/set-details/set-details';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const { data: set } = await supabaseAdmin
+  const { data: set } = await createServerSupabaseClient()
     .from('lego_sets')
     .select('*')
     .eq('id', id)
@@ -51,7 +51,7 @@ export default async function SetPage({ params }: Props) {
     notFound();
   }
 
-  const { data: set, error } = await supabaseAdmin
+  const { data: set, error } = await createServerSupabaseClient()
     .from('lego_sets')
     .select('*')
     .eq('id', id)

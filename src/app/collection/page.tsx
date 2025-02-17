@@ -11,6 +11,8 @@ import { SearchSetModal } from '@/components/modals/search-set-modal';
 import type { RebrickableSet } from '@/types/rebrickable';
 import { addLegoSet, getUserLegoSets } from '@/services/lego-sets';
 import { useToast } from '@/components/ui/use-toast';
+import { ShareCollectionModal } from '@/components/share-collection-modal';
+import { useCollectionSharing } from '@/hooks/use-collection-sharing';
 
 export default function CollectionPage(): React.ReactElement {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -19,6 +21,9 @@ export default function CollectionPage(): React.ReactElement {
   const { toast } = useToast();
   const { isLoaded, userId } = useAuth();
   const router = useRouter();
+  const { generateShareToken, isSharing } = useCollectionSharing({
+    userId: userId ?? '',
+  });
 
   useEffect(() => {
     if (isLoaded && !userId) {
@@ -76,10 +81,22 @@ export default function CollectionPage(): React.ReactElement {
     <div className="container mx-auto py-8">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Ma Collection</h1>
-        <Button onClick={(): void => setIsSearchModalOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Ajouter un set
-        </Button>
+        <div className="flex gap-2">
+          <ShareCollectionModal
+            onShare={async (isPublic) => {
+              const result = await generateShareToken(isPublic);
+              return result.shareToken;
+            }}
+          />
+          <Button
+            onClick={(): void => setIsSearchModalOpen(true)}
+            className="gap-2"
+            disabled={isLoading}
+          >
+            <Plus className="h-4 w-4" />
+            Ajouter un set
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
