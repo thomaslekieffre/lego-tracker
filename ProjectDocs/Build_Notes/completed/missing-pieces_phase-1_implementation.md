@@ -136,13 +136,6 @@ Implémenter la fonctionnalité de gestion des pièces manquantes pour les sets 
 - ✅ Validation des données
 - ✅ États de chargement
 
-## Next Steps
-
-1. Implémenter les notifications pour les changements de prix
-2. Ajouter un système de suggestions de vendeurs
-3. Intégrer un système de partage de pièces entre utilisateurs
-4. Améliorer les statistiques avec des graphiques
-
 ## Commit Message
 
 ```

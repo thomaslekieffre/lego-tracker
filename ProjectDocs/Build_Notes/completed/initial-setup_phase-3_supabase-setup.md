@@ -83,4 +83,4 @@ Mettre en place la base de données Supabase et configurer les tables nécessair
 - ✅ Implémentation des schémas Zod pour la validation
 - 📚 Documentation des types et schémas
 - ✅ Configuration Supabase hébergée terminée
-- 🎯 Prochaine action : Implémentation de la fonction de recherche de pièces
+- 🎯 Prochaine action : voir build note : `missing-pieces_phase-1_implementation.md`

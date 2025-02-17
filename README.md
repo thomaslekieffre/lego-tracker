@@ -1,38 +1,52 @@
-# Lego Tracker
+# 🧱 Lego Tracker
 
-Application web permettant aux collectionneurs de Lego de gérer leur collection, suivre l'état de leurs sets et gérer les pièces manquantes.
+Une application web moderne pour gérer votre collection de LEGO, suivre les pièces manquantes et partager votre collection.
 
-## Fonctionnalités
+## 🚀 Fonctionnalités
 
-- 🎯 Suivi des sets Lego (montés, démontés, incomplets)
-- 📦 Gestion des pièces manquantes
-- 🔔 Notifications de disponibilité des pièces
-- 📊 Statistiques de collection
-- 👥 Fonctionnalités communautaires
+- **Gestion de Collection**
 
-## Stack Technique
+  - Ajout de sets LEGO via l'API Rebrickable
+  - Suivi du statut (monté, démonté, incomplet)
+  - Notes personnalisées par set
+  - Visualisation détaillée des sets
 
-- **Frontend** : Next.js 15+, TypeScript, ShadcnUI, TailwindCSS
-- **Backend** : Supabase (PostgreSQL)
-- **Auth** : Clerk
-- **API** : Rebrickable
-- **State** : Zustand
-- **Testing** : Jest, React Testing Library
+- **Gestion des Pièces Manquantes**
 
-## Prérequis
+  - Ajout de pièces manquantes avec couleur
+  - Suivi du statut (en recherche, commandée, trouvée)
+  - Prix et liens d'achat
+  - Compteur automatique
 
-- Node.js 18+
-- pnpm
-- Compte Supabase
-- Compte Clerk
-- Clé API Rebrickable
+- **Partage de Collection**
+  - Liens de partage publics ou privés
+  - Expiration configurable
+  - Compteur de vues
+  - Vue optimisée pour le partage
 
-## Installation
+## 🛠️ Technologies
 
-1. Cloner le repo
+- **Frontend**
+
+  - Next.js 14 (App Router)
+  - React 18
+  - TypeScript
+  - Tailwind CSS
+  - Shadcn/UI
+  - Framer Motion
+
+- **Backend**
+  - Supabase (PostgreSQL)
+  - Row Level Security (RLS)
+  - Clerk (Authentification)
+  - API Rebrickable
+
+## 📦 Installation
+
+1. Cloner le repository
 
 ```bash
-git clone [repo-url]
+git clone https://github.com/votre-username/lego-tracker.git
 cd lego-tracker
 ```
 
@@ -45,77 +59,109 @@ pnpm install
 3. Configurer les variables d'environnement
 
 ```bash
-cp .env.example .env
-# Remplir les variables dans .env
+cp .env.example .env.local
 ```
 
-4. Lancer le serveur de développement
+4. Remplir les variables d'environnement :
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=votre_url_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=votre_clé_anon_supabase
+
+# Clerk
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=votre_clé_publique_clerk
+CLERK_SECRET_KEY=votre_clé_secrète_clerk
+CLERK_WEBHOOK_SECRET=votre_secret_webhook
+
+# Rebrickable
+REBRICKABLE_API_KEY=votre_clé_api_rebrickable
+```
+
+5. Lancer le serveur de développement
 
 ```bash
 pnpm dev
 ```
 
-## Structure du Projet
+## 🗄️ Structure du Projet
 
 ```
 lego-tracker/
 ├── src/
-│   ├── app/
-│   │   ├── components/    # Composants réutilisables
-│   │   ├── features/      # Fonctionnalités principales
-│   │   ├── hooks/         # Hooks personnalisés
-│   │   ├── layouts/       # Layouts de l'application
-│   │   ├── lib/          # Utilitaires et configurations
-│   │   └── styles/       # Styles globaux
-│   └── packages/         # Packages partagés
-├── ProjectDocs/
-│   ├── Build_Notes/      # Notes de build
-│   └── contexts/         # Contextes du projet
-└── public/              # Assets statiques
+│   ├── app/                    # Routes Next.js
+│   ├── components/             # Composants React
+│   ├── hooks/                  # Hooks personnalisés
+│   ├── lib/                    # Utilitaires et configurations
+│   ├── schemas/               # Schémas de validation
+│   └── types/                 # Types TypeScript
+├── supabase/
+│   └── migrations/            # Migrations SQL
+├── public/                    # Assets statiques
+└── ProjectDocs/              # Documentation technique
 ```
 
-## Contribution
+## 🔐 Base de Données
 
-1. Créer une branche (`git checkout -b feature/amazing-feature`)
-2. Commit les changements (`git commit -m 'feat: add amazing feature'`)
-3. Push la branche (`git push origin feature/amazing-feature`)
-4. Ouvrir une Pull Request
+La structure de la base de données est gérée via des migrations Supabase :
 
-## Licence
+- `users` : Informations utilisateur synchronisées avec Clerk
+- `lego_sets` : Collection de sets LEGO
+- `missing_pieces` : Pièces manquantes par set
+- `shared_collections` : Configuration des partages
 
-MIT
+## 🚥 Politiques de Sécurité
 
-## Getting Started
+Les politiques RLS assurent que :
 
-First, run the development server:
+- Chaque utilisateur ne peut voir et modifier que ses propres données
+- Les collections partagées sont accessibles via leur token
+- Les webhooks Clerk peuvent mettre à jour les utilisateurs
+
+## 🔄 Workflow de Développement
+
+1. Créer une nouvelle branche pour chaque feature
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git checkout -b feature/nom-de-la-feature
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Commiter avec des messages conventionnels
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+git commit -m "feat: description de la feature"
+git commit -m "fix: correction du bug"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Pousser et créer une Pull Request
 
-## Learn More
+```bash
+git push origin feature/nom-de-la-feature
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 📝 Conventions de Code
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **TypeScript strict** pour tout le code
+- **ESLint** et **Prettier** pour le formatage
+- **Composants fonctionnels** React
+- **Hooks personnalisés** pour la logique réutilisable
+- **Tests unitaires** pour les fonctions critiques
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🤝 Contribution
 
-## Deploy on Vercel
+1. Fork le projet
+2. Créer une branche (`git checkout -b feature/amazing-feature`)
+3. Commiter les changements (`git commit -m 'feat: add amazing feature'`)
+4. Push (`git push origin feature/amazing-feature`)
+5. Ouvrir une Pull Request
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📄 Licence
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## 🙏 Remerciements
+
+- [Rebrickable](https://rebrickable.com/) pour leur API
+- [Clerk](https://clerk.dev/) pour l'authentification
+- [Supabase](https://supabase.io/) pour la base de données
+- [Vercel](https://vercel.com/) pour l'hébergement

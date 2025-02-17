@@ -1,6 +1,6 @@
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
-import { supabaseAdmin } from '@/lib/supabase';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 type UserWebhookEvent = {
   data: {
@@ -17,6 +17,7 @@ type UserWebhookEvent = {
 async function updateSupabaseUser(event: UserWebhookEvent): Promise<void> {
   const { id, email_addresses, first_name, last_name, image_url } = event.data;
   const email = email_addresses[0]?.email_address;
+  const supabase = createServerSupabaseClient();
 
   if (!email) {
     console.error("Pas d'adresse email trouvée pour l'utilisateur:", id);
@@ -26,7 +27,7 @@ async function updateSupabaseUser(event: UserWebhookEvent): Promise<void> {
   switch (event.type) {
     case 'user.created':
     case 'user.updated':
-      const { error: upsertError } = await supabaseAdmin.from('users').upsert({
+      const { error: upsertError } = await supabase.from('users').upsert({
         clerk_id: id,
         email,
         display_name: first_name ? `${first_name} ${last_name ?? ''}`.trim() : null,
@@ -41,7 +42,7 @@ async function updateSupabaseUser(event: UserWebhookEvent): Promise<void> {
       break;
 
     case 'user.deleted':
-      const { error: deleteError } = await supabaseAdmin.from('users').delete().eq('clerk_id', id);
+      const { error: deleteError } = await supabase.from('users').delete().eq('clerk_id', id);
 
       if (deleteError) {
         console.error('Erreur lors de la suppression Supabase:', deleteError);

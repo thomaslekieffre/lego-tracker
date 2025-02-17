@@ -1,7 +1,7 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { RebrickableSet } from '@/types/rebrickable';
 import {
   LegoSetInsertSchema,
@@ -23,7 +23,7 @@ export async function addLegoSet(rebrickableSet: RebrickableSet): Promise<void> 
 
   try {
     // Récupérer l'utilisateur Supabase correspondant
-    const { data: userData, error: userError } = await supabaseAdmin
+    const { data: userData, error: userError } = await createServerSupabaseClient()
       .from('users')
       .select('clerk_id')
       .eq('clerk_id', userId)
@@ -47,7 +47,11 @@ export async function addLegoSet(rebrickableSet: RebrickableSet): Promise<void> 
       image_url: rebrickableSet.set_img_url || null,
     });
 
-    const { error } = await supabaseAdmin.from('lego_sets').insert([newSet]).select().single();
+    const { error } = await createServerSupabaseClient()
+      .from('lego_sets')
+      .insert([newSet])
+      .select()
+      .single();
 
     if (error) {
       console.error('Erreur Supabase:', error);
@@ -68,7 +72,7 @@ export async function getUserLegoSets(): Promise<any[]> {
       throw new Error('Utilisateur non authentifié');
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await createServerSupabaseClient()
       .from('lego_sets')
       .select('*')
       .eq('user_id', userId)
@@ -100,7 +104,7 @@ export async function updateSetStatus(
   try {
     const validatedStatus = LegoSetStatusSchema.parse(status);
 
-    const { error } = await supabaseAdmin
+    const { error } = await createServerSupabaseClient()
       .from('lego_sets')
       .update({
         status: validatedStatus,
@@ -130,7 +134,7 @@ export async function updateSetNotes(setId: string, notes: string): Promise<void
   }
 
   try {
-    const { error } = await supabaseAdmin
+    const { error } = await createServerSupabaseClient()
       .from('lego_sets')
       .update({
         notes,
@@ -160,7 +164,7 @@ export async function getMissingPieces(setId: string): Promise<any[]> {
   }
 
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await createServerSupabaseClient()
       .from('missing_pieces')
       .select('*')
       .eq('set_id', setId)
@@ -199,7 +203,7 @@ export async function addMissingPiece(
 
   try {
     // Vérifier que l'utilisateur possède bien le set
-    const { data: setData, error: setError } = await supabaseAdmin
+    const { data: setData, error: setError } = await createServerSupabaseClient()
       .from('lego_sets')
       .select('id')
       .eq('id', setId)
@@ -222,7 +226,7 @@ export async function addMissingPiece(
       price: piece.price || null,
     });
 
-    const { error } = await supabaseAdmin.from('missing_pieces').insert([newPiece]);
+    const { error } = await createServerSupabaseClient().from('missing_pieces').insert([newPiece]);
 
     if (error) {
       console.error('Erreur Supabase:', error);
@@ -246,7 +250,7 @@ export async function deleteMissingPiece(setId: string, pieceId: string): Promis
 
   try {
     // Vérifier que l'utilisateur possède bien le set
-    const { data: setData, error: setError } = await supabaseAdmin
+    const { data: setData, error: setError } = await createServerSupabaseClient()
       .from('lego_sets')
       .select('id')
       .eq('id', setId)
@@ -258,7 +262,7 @@ export async function deleteMissingPiece(setId: string, pieceId: string): Promis
     }
 
     // Récupérer la quantité de la pièce avant suppression
-    const { data: pieceData, error: pieceError } = await supabaseAdmin
+    const { data: pieceData, error: pieceError } = await createServerSupabaseClient()
       .from('missing_pieces')
       .select('quantity')
       .eq('id', pieceId)
@@ -269,7 +273,7 @@ export async function deleteMissingPiece(setId: string, pieceId: string): Promis
       throw new Error('Pièce non trouvée');
     }
 
-    const { error } = await supabaseAdmin
+    const { error } = await createServerSupabaseClient()
       .from('missing_pieces')
       .delete()
       .eq('id', pieceId)
@@ -303,7 +307,7 @@ export async function updateMissingPieceStatus(
 
   try {
     // Vérifier que l'utilisateur possède bien le set
-    const { data: setData, error: setError } = await supabaseAdmin
+    const { data: setData, error: setError } = await createServerSupabaseClient()
       .from('lego_sets')
       .select('id')
       .eq('id', setId)
@@ -327,7 +331,7 @@ export async function updateMissingPieceStatus(
       updateData.price = price;
     }
 
-    const { error } = await supabaseAdmin
+    const { error } = await createServerSupabaseClient()
       .from('missing_pieces')
       .update(updateData)
       .eq('id', pieceId)

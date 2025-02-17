@@ -14,19 +14,32 @@ import {
   HelpCircle,
   Menu,
   X,
+  Library,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Ma Collection', href: '/collection', icon: Boxes },
-  { name: 'Pièces Manquantes', href: '/missing-pieces', icon: Puzzle },
-  { name: 'Statistiques', href: '/stats', icon: BarChart3 },
-];
-
-const secondaryNavigation = [
-  { name: 'Paramètres', href: '/settings', icon: Settings },
-  { name: 'Aide', href: '/help', icon: HelpCircle },
+  {
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+  },
+  {
+    name: 'Ma Collection',
+    href: '/collection',
+    icon: Library,
+  },
+  {
+    name: 'Paramètres',
+    href: '/settings',
+    icon: Settings,
+  },
+  {
+    name: 'Aide',
+    href: '/help',
+    icon: HelpCircle,
+  },
 ];
 
 const sidebarVariants = {
@@ -53,69 +66,6 @@ const sidebarVariants = {
 export function Sidebar(): React.ReactElement {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const NavLinks = ({ onClick }: { onClick?: () => void }): React.ReactElement => (
-    <>
-      {/* Navigation principale */}
-      <div className="space-y-1 pt-4">
-        {navigation.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onClick}
-            className={cn(
-              'group flex items-center gap-x-3 rounded-md px-2 py-2 text-sm font-medium transition-colors',
-              pathname === item.href
-                ? 'bg-muted text-primary'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-            )}
-          >
-            <item.icon
-              className={cn(
-                'h-5 w-5 flex-shrink-0 transition-colors',
-                pathname === item.href
-                  ? 'text-primary'
-                  : 'text-muted-foreground group-hover:text-foreground'
-              )}
-              aria-hidden="true"
-            />
-            {item.name}
-          </Link>
-        ))}
-      </div>
-
-      {/* Navigation secondaire */}
-      <div className="mt-10">
-        <p className="px-2 text-xs font-semibold text-muted-foreground uppercase">Configuration</p>
-        <div className="mt-2 space-y-1">
-          {secondaryNavigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClick}
-              className={cn(
-                'group flex items-center gap-x-3 rounded-md px-2 py-2 text-sm font-medium transition-colors',
-                pathname === item.href
-                  ? 'bg-muted text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <item.icon
-                className={cn(
-                  'h-5 w-5 flex-shrink-0 transition-colors',
-                  pathname === item.href
-                    ? 'text-primary'
-                    : 'text-muted-foreground group-hover:text-foreground'
-                )}
-                aria-hidden="true"
-              />
-              {item.name}
-            </Link>
-          ))}
-        </div>
-      </div>
-    </>
-  );
 
   return (
     <>
@@ -153,18 +103,56 @@ export function Sidebar(): React.ReactElement {
             variants={sidebarVariants}
             className="fixed inset-y-0 left-0 z-50 w-64 bg-background border-r p-4 lg:hidden"
           >
-            <nav className="flex flex-col h-full pt-16">
-              <NavLinks onClick={(): void => setIsMobileMenuOpen(false)} />
-            </nav>
+            <div className="flex flex-col h-full pt-16">
+              <ScrollArea className="flex-1">
+                <div className="flex flex-1 flex-col gap-2 p-4">
+                  {navigation.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Button
+                        key={item.href}
+                        variant={pathname === item.href ? 'secondary' : 'ghost'}
+                        className={cn('w-full justify-start gap-2')}
+                        asChild
+                      >
+                        <Link href={item.href}>
+                          <Icon className="h-4 w-4" />
+                          {item.name}
+                        </Link>
+                      </Button>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            </div>
           </motion.aside>
         )}
       </AnimatePresence>
 
       {/* Sidebar desktop */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col lg:border-r lg:bg-background lg:pt-16 lg:pb-4">
-        <nav className="flex flex-col flex-1 px-4">
-          <NavLinks />
-        </nav>
+        <div className="flex flex-col flex-1 px-4">
+          <ScrollArea className="flex-1">
+            <div className="flex flex-1 flex-col gap-2 p-4">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.href}
+                    variant={pathname === item.href ? 'secondary' : 'ghost'}
+                    className={cn('w-full justify-start gap-2')}
+                    asChild
+                  >
+                    <Link href={item.href}>
+                      <Icon className="h-4 w-4" />
+                      {item.name}
+                    </Link>
+                  </Button>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </div>
       </aside>
     </>
   );

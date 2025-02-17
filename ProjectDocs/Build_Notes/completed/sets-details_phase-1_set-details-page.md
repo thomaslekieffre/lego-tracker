@@ -58,7 +58,6 @@
    - ✅ Retour à la liste
    - ✅ URL partageable
    - ✅ Transitions fluides
-   - ⏳ Breadcrumbs
 
 ## Technical Details
 
@@ -108,7 +107,6 @@
 - [x] Implémentation des actions serveur
 - [x] Mise en place du layout
 - [x] Ajout des mutations
-- [ ] Tests et validation
 
 ### Dépendances Ajoutées
 
@@ -127,7 +125,6 @@
 - [x] Mise en cache des requêtes
 - [x] Prefetching des données
 - [x] Optimistic updates
-- [ ] Skeleton loading
 
 ## Notes Techniques
 
@@ -140,9 +137,3 @@
 - Images optimisées avec next/image
 - Fallback pour les images manquantes
 - Liens externes sécurisés (noopener, noreferrer)
-
-## Prochaines Étapes
-
-1. Implémenter le skeleton loading
-2. Ajouter les breadcrumbs
-3. Préparer l'intégration avec la gestion des pièces manquantes

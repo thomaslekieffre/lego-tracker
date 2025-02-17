@@ -13,7 +13,8 @@ const matchRoute = (patterns: string[], pathname: string) =>
   patterns.some((pattern) => pathname.startsWith(pattern) || pathname === pattern);
 
 export default authMiddleware({
-  publicRoutes: [...publicRoutes, ...publicApiRoutes],
+  publicRoutes: ['/'],
+  ignoredRoutes: ['/api/webhooks/(.*)'],
   async afterAuth(auth, req: NextRequest) {
     // Gérer les routes d'API publiques
     if (matchRoute(publicApiRoutes, req.nextUrl.pathname)) {
@@ -37,5 +38,5 @@ export default authMiddleware({
 });
 
 export const config = {
-  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)', '/collection'],
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 };
