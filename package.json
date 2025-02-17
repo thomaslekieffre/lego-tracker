@@ -15,7 +15,7 @@
     "@clerk/nextjs": "^6.11.3",
     "@radix-ui/react-slot": "^1.1.2",
     "@supabase/supabase-js": "^2.48.1",
-    "@tanstack/react-query": "^5.66.0",
+    "@tanstack/react-query": "^5.66.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.3",
