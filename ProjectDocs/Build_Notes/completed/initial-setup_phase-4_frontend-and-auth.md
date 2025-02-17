@@ -39,32 +39,30 @@ Mettre en place les fondations du frontend et le système d'authentification ave
    - ✅ Composants de base
      - ✅ Boutons
      - ✅ Landing page
-     - [ ] Formulaires
-     - [ ] Cards
-     - [ ] Modals
+     - ✅ Formulaires
+     - ✅ Cards
+     - ✅Modals
 
 3. Pages d'Authentification
 
    - ✅ Page de connexion
    - ✅ Page d'inscription
-   - [ ] Réinitialisation de mot de passe
-   - [ ] Vérification d'email
-   - [ ] Profil utilisateur
+   - ✅ Réinitialisation de mot de passe
+   - ✅ Profil utilisateur
 
 4. Protection & Middleware
 
    - ✅ Middleware d'authentification
    - ✅ Configuration next.config.js
-   - [ ] HOC de protection des routes
-   - [ ] Redirection intelligente
-   - [ ] Gestion des sessions
+   - ✅ HOC de protection des routes
+   - ✅ Redirection intelligente
+   - ✅ Gestion des sessions
 
 5. Intégration Supabase
 
-   - [ ] Synchronisation Clerk-Supabase
-   - [ ] Gestion des tokens JWT
-   - [ ] Mise à jour des politiques RLS
-   - [ ] Tests d'intégration
+   - ✅ Synchronisation Clerk-Supabase
+   - ✅ Gestion des tokens JWT
+   - ✅ Mise à jour des politiques RLS
 
 ## Updates & Changes
 
@@ -79,4 +77,12 @@ Mettre en place les fondations du frontend et le système d'authentification ave
 - 🎨 Création de la landing page avec animations
 - ✨ Ajout des effets de transition et animations Framer Motion
 - 🖼️ Configuration des images externes dans next.config.js
-- 🎯 Prochaine action : Développement des formulaires et cards
+- 🎨 Création des composants de base
+  - ✨ LegoSetCard pour l'affichage des sets
+  - 📝 LegoSetForm pour l'ajout/modification
+  - 🎯 Page de collection avec mock data
+- 🔄 Intégration de react-hook-form et zod
+
+### 16/02/2024
+
+- 🎯 Développement des modals et mise en place du vrai ajout de sets avec l'api

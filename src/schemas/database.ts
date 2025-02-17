@@ -5,9 +5,12 @@ export const LegoSetStatusSchema = z.enum(['mounted', 'dismounted', 'incomplete'
 export const SubscriptionTierSchema = z.enum(['free', 'premium']);
 export const PieceStatusSchema = z.enum(['searching', 'found', 'ordered']);
 
+// Helper pour la validation des dates
+const dateSchema = z.string().datetime().or(z.date());
+
 // Base schemas
 export const UserSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1),
   email: z.string().email().min(3),
   subscription_tier: SubscriptionTierSchema,
   created_at: z.string().datetime(),
@@ -19,7 +22,7 @@ export const UserSchema = z.object({
 
 export const LegoSetSchema = z.object({
   id: z.string().uuid(),
-  user_id: z.string().uuid(),
+  user_id: z.string().min(1),
   rebrickable_id: z.string().min(1),
   name: z.string().min(1).max(255),
   set_number: z.string().min(1),
@@ -31,8 +34,8 @@ export const LegoSetSchema = z.object({
     .max(new Date().getFullYear() + 1),
   status: LegoSetStatusSchema,
   notes: z.string().max(1000).nullable(),
-  last_modified: z.string().datetime(),
-  created_at: z.string().datetime(),
+  last_modified: dateSchema,
+  created_at: dateSchema,
   image_url: z.string().url().nullable(),
   missing_pieces_count: z.number().int().min(0),
 });
@@ -77,10 +80,15 @@ export const MissingPieceUpdateSchema = MissingPieceInsertSchema.partial().requi
 
 // Statistics schema
 export const UserStatisticsSchema = z.object({
-  user_id: z.string().uuid(),
+  user_id: z.string().min(1),
   total_sets: z.number().int().min(0),
   mounted_sets: z.number().int().min(0),
   dismounted_sets: z.number().int().min(0),
   incomplete_sets: z.number().int().min(0),
   total_missing_pieces: z.number().int().min(0),
 });
+
+// Types dérivés des schémas
+export type LegoSet = z.infer<typeof LegoSetSchema>;
+export type User = z.infer<typeof UserSchema>;
+export type MissingPiece = z.infer<typeof MissingPieceSchema>;

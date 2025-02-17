@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { Header } from '@/components/layout/header';
 import { Sidebar } from '@/components/layout/sidebar';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -37,6 +38,7 @@ export default function RootLayout({
                 </main>
               </div>
             </div>
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>
