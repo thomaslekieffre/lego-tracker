@@ -17,11 +17,24 @@ export async function generateMetadata({ params }) {
     };
   }
 
+  // Récupérer l'ID Supabase de l'utilisateur
+  const { data: userData, error: userError } = await createServerSupabaseClient()
+    .from('users')
+    .select('id')
+    .eq('clerk_id', userId)
+    .single();
+
+  if (userError || !userData) {
+    return {
+      title: 'Set non trouvé | Lego Tracker',
+    };
+  }
+
   const { data: set } = await createServerSupabaseClient()
     .from('lego_sets')
     .select('*')
     .eq('id', id)
-    .eq('user_id', userId)
+    .eq('user_id', userData.id)
     .single();
 
   if (!set) {
@@ -45,11 +58,22 @@ export default async function SetPage({ params }) {
     notFound();
   }
 
+  // Récupérer l'ID Supabase de l'utilisateur
+  const { data: userData, error: userError } = await createServerSupabaseClient()
+    .from('users')
+    .select('id')
+    .eq('clerk_id', userId)
+    .single();
+
+  if (userError || !userData) {
+    notFound();
+  }
+
   const { data: set, error } = await createServerSupabaseClient()
     .from('lego_sets')
     .select('*')
     .eq('id', id)
-    .eq('user_id', userId)
+    .eq('user_id', userData.id)
     .single();
 
   if (error || !set) {
