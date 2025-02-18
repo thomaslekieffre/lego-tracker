@@ -1,94 +1,46 @@
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
+import { WebhookEvent } from '@clerk/nextjs/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
-type UserWebhookEvent = {
-  data: {
-    id: string;
-    email_addresses: Array<{ email_address: string; id: string }>;
-    first_name: string | null;
-    last_name: string | null;
-    image_url: string | null;
-  };
-  object: 'event';
-  type: 'user.created' | 'user.updated' | 'user.deleted';
-};
-
-async function updateSupabaseUser(event: UserWebhookEvent): Promise<void> {
-  const { id, email_addresses, first_name, last_name, image_url } = event.data;
-  const email = email_addresses[0]?.email_address;
-  const supabase = createServerSupabaseClient();
-
-  if (!email) {
-    console.error("Pas d'adresse email trouvée pour l'utilisateur:", id);
-    return;
-  }
-
-  switch (event.type) {
-    case 'user.created':
-    case 'user.updated':
-      const { error: upsertError } = await supabase.from('users').upsert({
-        clerk_id: id,
-        email,
-        display_name: first_name ? `${first_name} ${last_name ?? ''}`.trim() : null,
-        avatar_url: image_url,
-        updated_at: new Date().toISOString(),
-      });
-
-      if (upsertError) {
-        console.error('Erreur lors de la mise à jour Supabase:', upsertError);
-        throw upsertError;
-      }
-      break;
-
-    case 'user.deleted':
-      const { error: deleteError } = await supabase.from('users').delete().eq('clerk_id', id);
-
-      if (deleteError) {
-        console.error('Erreur lors de la suppression Supabase:', deleteError);
-        throw deleteError;
-      }
-      break;
-  }
-}
-
-export async function POST(req: Request): Promise<Response> {
+export async function POST(req: Request) {
   try {
-    // Vérifier la présence du secret
-    const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
-    if (!WEBHOOK_SECRET) {
-      throw new Error('CLERK_WEBHOOK_SECRET manquant');
-    }
+    // Récupérer le corps de la requête
+    const payload = await req.json();
+    const headersList = await headers();
 
     // Récupérer les headers Svix
-    const headersList = await headers();
-    const svixHeaders = {
-      'svix-id': headersList.get('svix-id') ?? '',
-      'svix-timestamp': headersList.get('svix-timestamp') ?? '',
-      'svix-signature': headersList.get('svix-signature') ?? '',
-    };
+    const svixId = headersList.get('svix-id') ?? '';
+    const svixTimestamp = headersList.get('svix-timestamp') ?? '';
+    const svixSignature = headersList.get('svix-signature') ?? '';
 
-    // Vérifier la présence des headers requis
-    if (
-      !svixHeaders['svix-id'] ||
-      !svixHeaders['svix-timestamp'] ||
-      !svixHeaders['svix-signature']
-    ) {
+    // Si un des headers est manquant, retourner une erreur
+    if (!svixId || !svixTimestamp || !svixSignature) {
+      console.error('Headers manquants:', { svixId, svixTimestamp, svixSignature });
       return new Response('Headers Svix manquants', {
         status: 400,
       });
     }
 
-    // Récupérer et vérifier le corps de la requête
-    const payload = await req.json();
-    const body = JSON.stringify(payload);
+    // Vérifier la signature du webhook
+    const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      console.error('CLERK_WEBHOOK_SECRET manquant');
+      return new Response('Secret webhook manquant', {
+        status: 500,
+      });
+    }
 
     // Vérifier la signature
-    const wh = new Webhook(WEBHOOK_SECRET);
-    let evt: UserWebhookEvent;
+    const wh = new Webhook(webhookSecret);
+    let evt: WebhookEvent;
 
     try {
-      evt = wh.verify(body, svixHeaders) as UserWebhookEvent;
+      evt = wh.verify(JSON.stringify(payload), {
+        'svix-id': svixId,
+        'svix-timestamp': svixTimestamp,
+        'svix-signature': svixSignature,
+      }) as WebhookEvent;
     } catch (err) {
       console.error('Erreur de vérification webhook:', err);
       return new Response('Signature invalide', {
@@ -96,10 +48,81 @@ export async function POST(req: Request): Promise<Response> {
       });
     }
 
-    await updateSupabaseUser(evt);
-    return new Response('Webhook traité avec succès', { status: 200 });
+    const eventType = evt.type;
+    const { id: clerkId } = evt.data;
+
+    if (!clerkId) {
+      console.error('ID Clerk manquant dans les données');
+      return new Response('ID Clerk manquant', {
+        status: 400,
+      });
+    }
+
+    console.log(`Webhook reçu! Type: ${eventType}, ID: ${clerkId}`);
+
+    const supabase = createServerSupabaseClient();
+
+    if (eventType === 'user.created') {
+      // Extraire les données de l'utilisateur depuis l'événement
+      const { email_addresses, image_url } = evt.data;
+      const primaryEmail = email_addresses?.[0]?.email_address;
+
+      // Convertir les chaînes vides en null et générer un email temporaire si nécessaire
+      const email = primaryEmail?.trim() ? primaryEmail : `temp-${clerkId}@lego-tracker.local`;
+
+      // Vérifier si l'utilisateur existe déjà
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', clerkId)
+        .single();
+
+      if (existingUser) {
+        console.log('Utilisateur déjà existant:', clerkId);
+        return new Response('Utilisateur déjà existant', {
+          status: 200,
+        });
+      }
+
+      // Créer l'utilisateur dans Supabase
+      const { data: newUser, error: insertError } = await supabase
+        .from('users')
+        .insert([
+          {
+            clerk_id: clerkId,
+            email,
+            avatar_url: image_url || null,
+            subscription_tier: 'free',
+          },
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Erreur création utilisateur:', insertError);
+        return new Response(JSON.stringify({ error: insertError.message }), {
+          status: 500,
+        });
+      }
+
+      console.log('Utilisateur créé avec succès:', newUser.id);
+      return new Response(JSON.stringify({ success: true, userId: newUser.id }), {
+        status: 201,
+      });
+    }
+
+    // Pour les autres types d'événements
+    return new Response('Événement ignoré', { status: 200 });
   } catch (error) {
-    console.error('Erreur de traitement webhook:', error);
-    return new Response('Erreur de traitement', { status: 500 });
+    console.error('Erreur générale webhook:', error);
+    return new Response(
+      JSON.stringify({
+        error: 'Erreur interne',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      }),
+      {
+        status: 500,
+      }
+    );
   }
 }
