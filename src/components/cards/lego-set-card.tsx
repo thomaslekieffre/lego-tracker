@@ -25,6 +25,7 @@ interface LegoSetCardProps {
   status: LegoSetStatus;
   missingPiecesCount: number;
   isSharedView?: boolean;
+  isCompact?: boolean;
 }
 
 export function LegoSetCard({
@@ -36,6 +37,7 @@ export function LegoSetCard({
   status,
   missingPiecesCount,
   isSharedView = false,
+  isCompact = false,
 }: LegoSetCardProps): React.ReactElement {
   const statusColor = {
     mounted: 'text-green-500',
@@ -52,9 +54,9 @@ export function LegoSetCard({
   const imageSrc = imageUrl && imageUrl.length > 0 ? imageUrl : '/placeholder-set.jpg';
 
   const content = (
-    <Card className="overflow-hidden">
+    <Card className={`overflow-hidden ${isCompact ? 'h-full' : ''}`}>
       <CardHeader className="p-0">
-        <div className="relative aspect-[4/3] w-full">
+        <div className={`relative ${isCompact ? 'aspect-square' : 'aspect-[4/3]'} w-full`}>
           <Image
             src={imageSrc}
             alt={name}
@@ -64,33 +66,35 @@ export function LegoSetCard({
           />
         </div>
       </CardHeader>
-      <CardContent className="p-4">
-        <CardTitle className="line-clamp-1">{name}</CardTitle>
+      <CardContent className={`${isCompact ? 'p-2' : 'p-4'}`}>
+        <CardTitle className={`line-clamp-1 ${isCompact ? 'text-sm' : ''}`}>{name}</CardTitle>
         <CardDescription className="mt-2 flex items-center justify-between">
           <span>{setNumber}</span>
           <span className={statusColor[status]}>{statusText[status]}</span>
         </CardDescription>
-        <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Boxes className="h-4 w-4" />
-            <span>{piecesCount} pièces</span>
-          </div>
-          {missingPiecesCount > 0 && (
-            <div className="flex items-center gap-1 text-red-500">
-              <Puzzle className="h-4 w-4" />
-              <span>
-                {missingPiecesCount} manquante{missingPiecesCount > 1 ? 's' : ''}
-              </span>
+        {!isCompact && (
+          <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Boxes className="h-4 w-4" />
+              <span>{piecesCount} pièces</span>
             </div>
-          )}
-        </div>
+            {missingPiecesCount > 0 && (
+              <div className="flex items-center gap-1 text-red-500">
+                <Puzzle className="h-4 w-4" />
+                <span>
+                  {missingPiecesCount} manquante{missingPiecesCount > 1 ? 's' : ''}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
-      {!isSharedView && (
+      {!isSharedView && !isCompact && (
         <CardFooter className="p-4 pt-0 flex gap-2">
           <Button variant="secondary" className="flex-1">
             Voir les détails
           </Button>
-          <ShareCollectionModal setId={id} />
+          <ShareCollectionModal />
         </CardFooter>
       )}
     </Card>
@@ -102,11 +106,12 @@ export function LegoSetCard({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
+      className="h-full"
     >
       {isSharedView ? (
-        <div className="group relative overflow-hidden">{content}</div>
+        <div className="group relative overflow-hidden h-full">{content}</div>
       ) : (
-        <Link href={`/collection/${id}`} className="block group relative overflow-hidden">
+        <Link href={`/collection/${id}`} className="block group relative overflow-hidden h-full">
           {content}
         </Link>
       )}
