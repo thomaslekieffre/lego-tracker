@@ -71,17 +71,24 @@ export async function POST(req: Request) {
         rawData: evt.data,
       });
 
-      // Générer un email temporaire par défaut
+      // Générer un email temporaire
       const tempEmail = `temp-${clerkId}@lego-tracker.local`;
 
       // Tenter de récupérer un email valide
       let email = tempEmail;
-      if (email_addresses && email_addresses.length > 0 && email_addresses[0].email_address) {
+      if (email_addresses?.length > 0) {
         const primaryEmail = email_addresses[0].email_address;
-        if (primaryEmail !== 'EMPTY' && primaryEmail.trim() !== '') {
+        if (
+          primaryEmail &&
+          typeof primaryEmail === 'string' &&
+          primaryEmail.trim() !== '' &&
+          primaryEmail !== 'EMPTY'
+        ) {
           email = primaryEmail.trim();
         }
       }
+
+      console.log('Email final utilisé:', email);
 
       // Vérifier si l'utilisateur existe déjà
       const { data: existingUser } = await supabase
@@ -97,13 +104,13 @@ export async function POST(req: Request) {
         });
       }
 
-      // Créer l'utilisateur dans Supabase avec un email temporaire si nécessaire
+      // Créer l'utilisateur dans Supabase
       const { data: newUser, error: insertError } = await supabase
         .from('users')
         .insert([
           {
             clerk_id: clerkId,
-            email: email === 'EMPTY' ? `temp-${clerkId}@lego-tracker.local` : email,
+            email: email,
             avatar_url: image_url || null,
             subscription_tier: 'free',
           },
