@@ -52,7 +52,7 @@ Une application en production qui soit :
 
 ## Updates & Changes
 
-### 2024-03-21
+### 2025-02-18
 
 - ✅ Configuration ESLint production
   - Conservation des règles critiques
@@ -62,9 +62,6 @@ Une application en production qui soit :
   - Suppression des console.log
   - Optimisation des imports
   - Correction des warnings
-
-### 2024-03-22
-
 - ✅ Configuration de production
   - Variables d'environnement
   - Build optimisé
@@ -73,9 +70,6 @@ Une application en production qui soit :
   - Vercel Analytics
   - Logs structurés
   - Alertes
-
-### 2024-03-23
-
 - ✅ Déploiement
   - Tests de charge
   - Vérifications de sécurité
