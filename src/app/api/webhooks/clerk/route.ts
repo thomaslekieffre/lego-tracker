@@ -65,11 +65,24 @@ export async function POST(req: Request) {
     if (eventType === 'user.created') {
       // Extraire les données de l'utilisateur depuis l'événement
       const { email_addresses, image_url } = evt.data;
-      const primaryEmail = email_addresses?.[0]?.email_address;
+      console.log('Données reçues de Clerk:', {
+        email_addresses,
+        image_url,
+        rawData: evt.data,
+      });
 
-      // Vérifier si l'email est vide ou null et générer un email temporaire si nécessaire
-      const trimmedEmail = primaryEmail?.trim() || '';
-      const email = trimmedEmail.length > 0 ? trimmedEmail : `temp-${clerkId}@lego-tracker.local`;
+      const primaryEmail = email_addresses?.[0]?.email_address;
+      console.log('Email primaire:', primaryEmail);
+
+      // Forcer un email temporaire si pas d'email valide
+      let email: string;
+      if (!primaryEmail || primaryEmail.trim() === '' || primaryEmail === 'EMPTY') {
+        email = `temp-${clerkId}@lego-tracker.local`;
+        console.log("Utilisation d'un email temporaire:", email);
+      } else {
+        email = primaryEmail.trim();
+        console.log("Utilisation de l'email fourni:", email);
+      }
 
       // Vérifier si l'utilisateur existe déjà
       const { data: existingUser } = await supabase
