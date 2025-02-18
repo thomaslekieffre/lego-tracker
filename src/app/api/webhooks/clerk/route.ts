@@ -67,8 +67,9 @@ export async function POST(req: Request) {
       const { email_addresses, image_url } = evt.data;
       const primaryEmail = email_addresses?.[0]?.email_address;
 
-      // Convertir les chaînes vides en null et générer un email temporaire si nécessaire
-      const email = primaryEmail?.trim() ? primaryEmail : `temp-${clerkId}@lego-tracker.local`;
+      // Vérifier si l'email est vide ou null et générer un email temporaire si nécessaire
+      const trimmedEmail = primaryEmail?.trim() || '';
+      const email = trimmedEmail.length > 0 ? trimmedEmail : `temp-${clerkId}@lego-tracker.local`;
 
       // Vérifier si l'utilisateur existe déjà
       const { data: existingUser } = await supabase
