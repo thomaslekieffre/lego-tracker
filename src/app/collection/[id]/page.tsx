@@ -8,7 +8,7 @@ import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 
 interface Props {
   params: Promise<{ id: string }>;
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
