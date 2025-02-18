@@ -75,25 +75,6 @@ pnpm dev
 
 - [Contexte du Projet](./ProjectDocs/contexts/projectContext.md)
 - [Notes de Build](./ProjectDocs/Build_Notes/)
-- [API Documentation](./ProjectDocs/api.md)
-
-## 🧪 Tests
-
-```bash
-# Tests unitaires
-pnpm test
-
-# Tests E2E
-pnpm test:e2e
-```
-
-## 📱 PWA
-
-L'application est une PWA et peut être installée sur :
-
-- Android
-- iOS
-- Desktop
 
 ## 🔒 Sécurité
 
@@ -123,7 +104,6 @@ MIT - Voir [LICENSE](LICENSE) pour plus de détails.
 ## 📞 Support
 
 - GitHub Issues
-- Email : support@example.com
 
 ## ⭐️ Remerciements
 
