@@ -65,30 +65,47 @@ export async function POST(req: Request) {
     if (eventType === 'user.created') {
       // Extraire les données de l'utilisateur depuis l'événement
       const { email_addresses, image_url } = evt.data;
-      console.log('Données reçues de Clerk:', {
-        email_addresses,
-        image_url,
-        rawData: evt.data,
-      });
 
-      // Générer un email temporaire
-      const tempEmail = `temp-${clerkId}@lego-tracker.local`;
+      // Log détaillé des données reçues
+      console.log('Données brutes du webhook:', JSON.stringify(evt.data, null, 2));
+      console.log('Email addresses:', JSON.stringify(email_addresses, null, 2));
+
+      // Générer un email temporaire unique
+      const tempEmail = `temp-${clerkId}-${Date.now()}@lego-tracker.local`;
+      console.log('Email temporaire généré:', tempEmail);
 
       // Tenter de récupérer un email valide
       let email = tempEmail;
-      if (email_addresses?.length > 0) {
-        const primaryEmail = email_addresses[0].email_address;
-        if (
-          primaryEmail &&
-          typeof primaryEmail === 'string' &&
-          primaryEmail.trim() !== '' &&
-          primaryEmail !== 'EMPTY'
-        ) {
-          email = primaryEmail.trim();
+
+      // Log de la vérification des emails
+      if (email_addresses) {
+        console.log("Nombre d'emails trouvés:", email_addresses.length);
+        if (email_addresses.length > 0) {
+          console.log('Premier email trouvé:', email_addresses[0]);
+          const primaryEmail = email_addresses[0].email_address;
+          console.log('Email primaire extrait:', primaryEmail);
+
+          if (primaryEmail && typeof primaryEmail === 'string') {
+            const trimmedEmail = primaryEmail.trim();
+            console.log('Email après trim:', trimmedEmail);
+
+            if (trimmedEmail !== '' && trimmedEmail !== 'EMPTY') {
+              email = trimmedEmail;
+              console.log('Email valide trouvé:', email);
+            } else {
+              console.log('Email invalide (vide ou EMPTY), utilisation du temporaire');
+            }
+          } else {
+            console.log('Email primaire invalide:', primaryEmail);
+          }
+        } else {
+          console.log('Aucun email trouvé dans la liste');
         }
+      } else {
+        console.log("Pas de liste d'emails reçue");
       }
 
-      console.log('Email final utilisé:', email);
+      console.log('Email final qui sera utilisé:', email);
 
       // Vérifier si l'utilisateur existe déjà
       const { data: existingUser } = await supabase
@@ -110,7 +127,7 @@ export async function POST(req: Request) {
         .insert([
           {
             clerk_id: clerkId,
-            email: email,
+            email,
             avatar_url: image_url || null,
             subscription_tier: 'free',
           },
@@ -120,12 +137,23 @@ export async function POST(req: Request) {
 
       if (insertError) {
         console.error('Erreur création utilisateur:', insertError);
+        console.error("Détails de l'erreur:", {
+          code: insertError.code,
+          message: insertError.message,
+          details: insertError.details,
+          hint: insertError.hint,
+        });
         return new Response(JSON.stringify({ error: insertError.message }), {
           status: 500,
         });
       }
 
-      console.log('Utilisateur créé avec succès:', newUser.id);
+      console.log('Utilisateur créé avec succès:', {
+        id: newUser.id,
+        clerk_id: newUser.clerk_id,
+        email: newUser.email,
+      });
+
       return new Response(JSON.stringify({ success: true, userId: newUser.id }), {
         status: 201,
       });
