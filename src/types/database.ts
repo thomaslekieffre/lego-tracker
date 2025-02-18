@@ -12,7 +12,7 @@ export interface Database {
   };
 }
 
-interface DatabaseTables {
+export interface DatabaseTables {
   users: {
     Row: {
       id: string;

@@ -11,9 +11,10 @@ import type { RebrickableSet } from '@/types/rebrickable';
 import { addLegoSet } from '@/services/lego-sets';
 import { useToast } from '@/components/ui/use-toast';
 import { useDisplaySettings } from '@/stores/display-settings';
+import type { DatabaseTables } from '@/types/database';
 
 interface CollectionContentProps {
-  initialSets: any[];
+  initialSets: DatabaseTables['lego_sets']['Row'][];
 }
 
 export function CollectionContent({ initialSets }: CollectionContentProps) {
