@@ -12,6 +12,7 @@ import {
 import { randomUUID } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { rebrickableClient, RebrickablePart } from '@/lib/rebrickable';
+import { nanoid } from 'nanoid';
 
 export async function addLegoSet(rebrickableSet: RebrickableSet): Promise<void> {
   const session = await auth();
@@ -25,7 +26,7 @@ export async function addLegoSet(rebrickableSet: RebrickableSet): Promise<void> 
     // Récupérer l'utilisateur Supabase correspondant
     const { data: userData, error: userError } = await createServerSupabaseClient()
       .from('users')
-      .select('clerk_id')
+      .select('id')
       .eq('clerk_id', userId)
       .single();
 
@@ -36,7 +37,7 @@ export async function addLegoSet(rebrickableSet: RebrickableSet): Promise<void> 
 
     const newSet = LegoSetInsertSchema.parse({
       id: randomUUID(),
-      user_id: userData.clerk_id,
+      user_id: userData.id,
       rebrickable_id: rebrickableSet.set_num,
       name: rebrickableSet.name,
       set_number: rebrickableSet.set_num,
@@ -72,10 +73,23 @@ export async function getUserLegoSets(): Promise<any[]> {
       throw new Error('Utilisateur non authentifié');
     }
 
+    // Récupérer l'ID Supabase de l'utilisateur
+    const { data: userData, error: userError } = await createServerSupabaseClient()
+      .from('users')
+      .select('id')
+      .eq('clerk_id', userId)
+      .single();
+
+    if (userError || !userData) {
+      console.error("Erreur lors de la récupération de l'utilisateur:", userError);
+      throw new Error('Utilisateur non trouvé dans Supabase');
+    }
+
+    // Récupérer les sets avec l'ID Supabase
     const { data, error } = await createServerSupabaseClient()
       .from('lego_sets')
       .select('*')
-      .eq('user_id', userId)
+      .eq('user_id', userData.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -373,5 +387,50 @@ export async function getPartDetails(partNum: string) {
   } catch (error) {
     console.error('Erreur lors de la récupération des détails de la pièce:', error);
     throw error;
+  }
+}
+
+export async function createShareToken(isPublic: boolean = false): Promise<string> {
+  const session = await auth();
+  const userId = session.userId;
+
+  if (!userId) {
+    throw new Error('Vous devez être connecté pour partager une collection');
+  }
+
+  try {
+    // Récupérer l'ID Supabase de l'utilisateur
+    const { data: userData, error: userError } = await createServerSupabaseClient()
+      .from('users')
+      .select('id')
+      .eq('clerk_id', userId)
+      .single();
+
+    if (userError || !userData) {
+      console.error("Erreur lors de la récupération de l'utilisateur:", userError);
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    // Créer le partage de collection
+    const shareToken = nanoid(12);
+    const { error: shareError } = await createServerSupabaseClient()
+      .from('shared_collections')
+      .insert({
+        user_id: userData.id,
+        share_token: shareToken,
+        is_public: isPublic,
+        views_count: 0,
+        collection_name: 'Ma Collection LEGO',
+      });
+
+    if (shareError) {
+      console.error('Erreur lors de la création du partage:', shareError);
+      throw new Error('Erreur lors de la création du lien de partage');
+    }
+
+    return shareToken;
+  } catch (error) {
+    console.error('Erreur lors de la création du lien de partage:', error);
+    throw error instanceof Error ? error : new Error('Erreur inconnue');
   }
 }

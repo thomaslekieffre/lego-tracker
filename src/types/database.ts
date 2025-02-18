@@ -67,6 +67,20 @@ interface DatabaseTables {
     Insert: Omit<DatabaseTables['missing_pieces']['Row'], 'created_at' | 'updated_at'>;
     Update: Partial<DatabaseTables['missing_pieces']['Insert']>;
   };
+  shared_collections: {
+    Row: {
+      id: string;
+      user_id: string;
+      share_token: string;
+      is_public: boolean;
+      expires_at: string | null;
+      views_count: number;
+      created_at: string;
+      updated_at: string;
+    };
+    Insert: Omit<DatabaseTables['shared_collections']['Row'], 'created_at' | 'updated_at'>;
+    Update: Partial<DatabaseTables['shared_collections']['Insert']>;
+  };
 }
 
 interface DatabaseViews {
@@ -91,4 +105,16 @@ interface DatabaseFunctions {
     Args: { query: string };
     Returns: DatabaseTables['missing_pieces']['Row'][];
   };
+}
+
+export interface SharedCollection {
+  id: string;
+  user_id: string;
+  set_id: string;
+  share_token: string;
+  is_public: boolean;
+  expires_at: string | null;
+  views_count: number;
+  created_at: string;
+  updated_at: string;
 }

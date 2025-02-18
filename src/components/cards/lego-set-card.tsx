@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Boxes, Puzzle } from 'lucide-react';
 import { LegoSetStatus } from '@/types/database';
+import { ShareCollectionModal } from '@/components/share-collection-modal';
 
 interface LegoSetCardProps {
   id: string;
@@ -85,10 +86,11 @@ export function LegoSetCard({
         </div>
       </CardContent>
       {!isSharedView && (
-        <CardFooter className="p-4 pt-0">
-          <Button asChild className="w-full">
-            <Link href={`/collection/${id}`}>Voir les détails</Link>
+        <CardFooter className="p-4 pt-0 flex gap-2">
+          <Button variant="secondary" className="flex-1">
+            Voir les détails
           </Button>
+          <ShareCollectionModal setId={id} />
         </CardFooter>
       )}
     </Card>
@@ -104,7 +106,7 @@ export function LegoSetCard({
       {isSharedView ? (
         <div className="group relative overflow-hidden">{content}</div>
       ) : (
-        <Link href={`/collection/${id}`} className="group relative overflow-hidden">
+        <Link href={`/collection/${id}`} className="block group relative overflow-hidden">
           {content}
         </Link>
       )}

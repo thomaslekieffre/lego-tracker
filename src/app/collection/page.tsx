@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, Share2 } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,6 @@ import type { RebrickableSet } from '@/types/rebrickable';
 import { addLegoSet, getUserLegoSets } from '@/services/lego-sets';
 import { useToast } from '@/components/ui/use-toast';
 import { ShareCollectionModal } from '@/components/share-collection-modal';
-import { useCollectionSharing } from '@/hooks/use-collection-sharing';
 
 export default function CollectionPage(): React.ReactElement {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -21,9 +20,6 @@ export default function CollectionPage(): React.ReactElement {
   const { toast } = useToast();
   const { isLoaded, userId } = useAuth();
   const router = useRouter();
-  const { generateShareToken, isSharing } = useCollectionSharing({
-    userId: userId ?? '',
-  });
 
   useEffect(() => {
     if (isLoaded && !userId) {
@@ -73,6 +69,29 @@ export default function CollectionPage(): React.ReactElement {
     }
   };
 
+  const handleShare = async (isPublic: boolean) => {
+    try {
+      const response = await fetch('/api/share', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isPublic }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de la création du lien de partage');
+      }
+
+      return { shareToken: data.shareToken };
+    } catch (error) {
+      console.error('Erreur lors du partage:', error);
+      throw error;
+    }
+  };
+
   if (!isLoaded || !userId) {
     return <div className="container mx-auto py-8">Chargement...</div>;
   }
@@ -82,12 +101,7 @@ export default function CollectionPage(): React.ReactElement {
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Ma Collection</h1>
         <div className="flex gap-2">
-          <ShareCollectionModal
-            onShare={async (isPublic) => {
-              const result = await generateShareToken(isPublic);
-              return result.shareToken;
-            }}
-          />
+          <ShareCollectionModal onShare={handleShare} />
           <Button
             onClick={(): void => setIsSearchModalOpen(true)}
             className="gap-2"
