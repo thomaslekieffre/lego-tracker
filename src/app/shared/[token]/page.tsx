@@ -3,12 +3,6 @@ import { LegoSetCard } from '@/components/cards/lego-set-card';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
-interface SharedCollectionPageProps {
-  params: {
-    token: string;
-  };
-}
-
 function LoadingState() {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -27,7 +21,7 @@ function LoadingState() {
   );
 }
 
-export default async function SharedCollectionPage({ params }: SharedCollectionPageProps) {
+export default async function SharedCollectionPage({ params }) {
   const { token } = params;
 
   // Récupérer les informations de partage

@@ -6,13 +6,8 @@ import { LegoSetSchema } from '@/schemas/database';
 import { SetDetails } from '@/components/set-details/set-details';
 import { Breadcrumbs } from '@/components/navigation/breadcrumbs';
 
-interface Props {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+export async function generateMetadata({ params }) {
+  const { id } = params;
   const session = await auth();
   const userId = session.userId;
 
@@ -41,8 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function SetPage({ params }: Props) {
-  const { id } = await params;
+export default async function SetPage({ params }) {
+  const { id } = params;
   const session = await auth();
   const userId = session.userId;
 
