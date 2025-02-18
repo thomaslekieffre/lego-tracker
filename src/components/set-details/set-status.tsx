@@ -60,11 +60,7 @@ export function SetStatus({ set }: SetStatusProps) {
         <SelectTrigger className="w-full">
           <SelectValue>
             <AnimatePresence mode="wait">
-              <AnimatedContainer
-                key={status}
-                animation="animate-fade-in"
-                className="flex items-center gap-2"
-              >
+              <AnimatedContainer key={status} className="flex items-center gap-2">
                 <Badge variant="secondary" className="relative px-4 py-1 flex items-center gap-2">
                   <motion.div
                     layoutId="status-dot"
