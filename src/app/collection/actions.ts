@@ -1,7 +1,7 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, createServerSupabaseAdminClient } from '@/lib/supabase/server';
 import { RebrickableSet } from '@/types/rebrickable';
 import {
   LegoSetInsertSchema,
@@ -395,12 +395,15 @@ export async function createShareToken(isPublic: boolean = false): Promise<strin
   const userId = session.userId;
 
   if (!userId) {
-    throw new Error('Vous devez être connecté pour partager une collection');
+    throw new Error('Non authentifié');
   }
 
   try {
+    const supabase = createServerSupabaseAdminClient();
+    const shareToken = nanoid(12);
+
     // Récupérer l'ID Supabase de l'utilisateur
-    const { data: userData, error: userError } = await createServerSupabaseClient()
+    const { data: userData, error: userError } = await supabase
       .from('users')
       .select('id')
       .eq('clerk_id', userId)
@@ -408,29 +411,36 @@ export async function createShareToken(isPublic: boolean = false): Promise<strin
 
     if (userError || !userData) {
       console.error("Erreur lors de la récupération de l'utilisateur:", userError);
-      throw new Error('Utilisateur non trouvé');
+      throw new Error('Utilisateur non trouvé dans Supabase');
     }
 
-    // Créer le partage de collection
-    const shareToken = nanoid(12);
-    const { error: shareError } = await createServerSupabaseClient()
+    console.log('Tentative de création du partage avec:', {
+      user_id: userData.id,
+      share_token: shareToken,
+      is_public: isPublic,
+    });
+
+    // Insertion avec retour des données
+    const { data: share, error: insertError } = await supabase
       .from('shared_collections')
       .insert({
         user_id: userData.id,
         share_token: shareToken,
         is_public: isPublic,
         views_count: 0,
-        collection_name: 'Ma Collection LEGO',
-      });
+      })
+      .select()
+      .single();
 
-    if (shareError) {
-      console.error('Erreur lors de la création du partage:', shareError);
-      throw new Error('Erreur lors de la création du lien de partage');
+    if (insertError) {
+      console.error("Erreur lors de l'insertion:", insertError);
+      throw new Error('Erreur lors de la création du partage');
     }
 
+    console.log('Partage créé avec succès:', share);
     return shareToken;
   } catch (error) {
-    console.error('Erreur lors de la création du lien de partage:', error);
-    throw error instanceof Error ? error : new Error('Erreur inconnue');
+    console.error('Erreur détaillée:', error);
+    throw error instanceof Error ? error : new Error('Erreur lors de la création du partage');
   }
 }

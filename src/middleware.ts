@@ -1,6 +1,7 @@
 import { authMiddleware } from '@clerk/nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 // Routes publiques qui ne nécessitent pas d'authentification
 const publicRoutes = ['/', '/sign-in', '/sign-up'];
@@ -31,6 +32,38 @@ export default authMiddleware({
     // Redirection vers la collection pour les utilisateurs connectés qui tentent d'accéder aux pages de connexion
     if (auth.userId && matchRoute(['/sign-in', '/sign-up'], req.nextUrl.pathname)) {
       return NextResponse.redirect(new URL('/collection', req.url));
+    }
+
+    // Si l'utilisateur n'est pas authentifié, continuer normalement
+    if (!auth.userId) {
+      return;
+    }
+
+    try {
+      // Récupérer l'utilisateur Supabase correspondant
+      const supabase = createServerSupabaseClient();
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', auth.userId)
+        .single();
+
+      // Si l'utilisateur n'existe pas dans Supabase, le créer
+      if (userError && userError.code === 'PGRST116') {
+        const { error: insertError } = await supabase.from('users').insert({
+          clerk_id: auth.userId,
+          email: auth.user?.emailAddresses[0]?.emailAddress ?? '',
+          subscription_tier: 'free',
+        });
+
+        if (insertError) {
+          console.error("Erreur lors de la création de l'utilisateur:", insertError);
+        }
+      } else if (userError) {
+        console.error("Erreur lors de la récupération de l'utilisateur:", userError);
+      }
+    } catch (error) {
+      console.error('Erreur dans le middleware:', error);
     }
 
     return NextResponse.next();

@@ -1,14 +1,6 @@
 -- Supprimer les anciennes entrées
 TRUNCATE TABLE shared_collections;
 
--- Supprimer la contrainte de clé étrangère sur set_id
-ALTER TABLE shared_collections
-DROP CONSTRAINT IF EXISTS shared_collections_set_id_fkey;
-
--- Supprimer la colonne set_id
-ALTER TABLE shared_collections
-DROP COLUMN IF EXISTS set_id;
-
 -- Ajouter une colonne pour le titre de la collection
 ALTER TABLE shared_collections
 ADD COLUMN collection_name TEXT NOT NULL DEFAULT 'Ma Collection LEGO';

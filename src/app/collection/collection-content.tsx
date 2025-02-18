@@ -47,6 +47,35 @@ export function CollectionContent({ initialSets }: CollectionContentProps) {
     }
   };
 
+  // Si pas de sets, afficher un message
+  if (!sets || sets.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="text-3xl font-bold">Ma Collection</h1>
+          <Button
+            onClick={(): void => setIsSearchModalOpen(true)}
+            className="gap-2 w-full sm:w-auto"
+            disabled={isLoading}
+          >
+            <Plus className="h-4 w-4" />
+            Ajouter un set
+          </Button>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">
+            Votre collection est vide. Ajoutez votre premier set !
+          </p>
+        </div>
+        <SearchSetModal
+          isOpen={isSearchModalOpen}
+          onClose={(): void => setIsSearchModalOpen(false)}
+          onSelect={handleAddSet}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

@@ -117,7 +117,8 @@ CREATE TABLE shared_collections (
     expires_at TIMESTAMPTZ,
     views_count INT DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    collection_name TEXT NOT NULL DEFAULT 'Ma Collection LEGO'
 );
 
 -- Create user_statistics view
@@ -132,30 +133,43 @@ SELECT
 FROM lego_sets l
 GROUP BY l.user_id;
 
--- Drop existing policies if they exist
-DROP POLICY IF EXISTS "Users can manage their own sets" ON lego_sets;
+-- Drop existing policies
+DROP POLICY IF EXISTS "Users can view own sets" ON lego_sets;
+DROP POLICY IF EXISTS "Users can insert own sets" ON lego_sets;
+DROP POLICY IF EXISTS "Users can update own sets" ON lego_sets;
+DROP POLICY IF EXISTS "Users can delete own sets" ON lego_sets;
 DROP POLICY IF EXISTS "Users can view pieces from own sets" ON missing_pieces;
 DROP POLICY IF EXISTS "Users can insert pieces to own sets" ON missing_pieces;
 DROP POLICY IF EXISTS "Users can update pieces from own sets" ON missing_pieces;
 DROP POLICY IF EXISTS "Users can delete pieces from own sets" ON missing_pieces;
 DROP POLICY IF EXISTS "Users can manage their own shared collections" ON shared_collections;
+DROP POLICY IF EXISTS "Anyone can view public shared collections" ON shared_collections;
 
--- Add RLS policies
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE lego_sets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE missing_pieces ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shared_collections ENABLE ROW LEVEL SECURITY;
-
--- Users policies
-CREATE POLICY "Users can view their own data"
-ON users
-FOR SELECT
-USING (auth.uid()::text = clerk_id);
-
--- Lego sets policies
-CREATE POLICY "Users can manage their own sets"
+-- Recreate policies with user_id checks
+CREATE POLICY "Users can view own sets"
 ON lego_sets
-FOR ALL
+FOR SELECT
+USING (user_id IN (
+    SELECT id FROM users WHERE clerk_id = auth.uid()::text
+));
+
+CREATE POLICY "Users can insert own sets"
+ON lego_sets
+FOR INSERT
+WITH CHECK (user_id IN (
+    SELECT id FROM users WHERE clerk_id = auth.uid()::text
+));
+
+CREATE POLICY "Users can update own sets"
+ON lego_sets
+FOR UPDATE
+USING (user_id IN (
+    SELECT id FROM users WHERE clerk_id = auth.uid()::text
+));
+
+CREATE POLICY "Users can delete own sets"
+ON lego_sets
+FOR DELETE
 USING (user_id IN (
     SELECT id FROM users WHERE clerk_id = auth.uid()::text
 ));

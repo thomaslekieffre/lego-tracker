@@ -23,7 +23,7 @@ interface ShareCollectionModalProps {
 
 export function ShareCollectionModal({ className }: ShareCollectionModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isPublic, setIsPublic] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
   const [shareUrl, setShareUrl] = useState<string>('');
   const [hasCopied, setHasCopied] = useState(false);
   const { toast } = useToast();
@@ -35,9 +35,10 @@ export function ShareCollectionModal({ className }: ShareCollectionModalProps) {
   const handleShare = async () => {
     try {
       const shareToken = await generateShareToken();
-      const url = `${window.location.origin}/shared/${shareToken}`;
+      const url = `${window.location.origin}/share/${shareToken}`;
       setShareUrl(url);
     } catch (err) {
+      console.error('Erreur lors du partage:', err);
       toast({
         variant: 'destructive',
         title: 'Erreur',
@@ -75,9 +76,7 @@ export function ShareCollectionModal({ className }: ShareCollectionModalProps) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Partager ma collection</DialogTitle>
-          <DialogDescription>
-            Créez un lien de partage pour votre collection LEGO complète
-          </DialogDescription>
+          <DialogDescription>Créez un lien de partage pour votre collection LEGO</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="flex items-center justify-between space-x-2">

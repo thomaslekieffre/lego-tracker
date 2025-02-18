@@ -3,6 +3,7 @@
 import { auth } from '@clerk/nextjs';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { subMonths, subWeeks, startOfDay } from 'date-fns';
+import { LegoSetStatus } from '@/types/database';
 
 export type DashboardStats = {
   totalSets: number;
@@ -19,11 +20,15 @@ export type SetDistribution = {
 
 export type RecentActivity = {
   id: string;
-  type: 'set_status' | 'piece_status' | 'set_added' | 'piece_added';
+  type: 'set_status' | 'piece_status';
   timestamp: string;
   title: string;
   description: string;
-  metadata?: Record<string, any>;
+  metadata: {
+    setId: string;
+    status: string;
+    pieceId?: string;
+  };
 };
 
 export async function getDashboardStats(): Promise<DashboardStats> {
@@ -34,11 +39,25 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     throw new Error('Utilisateur non authentifié');
   }
 
+  const supabase = createServerSupabaseClient();
+
+  // Récupérer l'ID Supabase de l'utilisateur
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('clerk_id', userId)
+    .single();
+
+  if (userError || !userData) {
+    console.error("Erreur lors de la récupération de l'utilisateur:", userError);
+    throw new Error('Utilisateur non trouvé dans Supabase');
+  }
+
   // Récupérer les statistiques actuelles
-  const { data: currentStats, error: statsError } = await createServerSupabaseClient()
+  const { data: currentStats, error: statsError } = await supabase
     .from('lego_sets')
     .select('status, missing_pieces_count')
-    .eq('user_id', userId);
+    .eq('user_id', userData.id);
 
   if (statsError) {
     throw new Error('Erreur lors de la récupération des statistiques');
@@ -69,10 +88,24 @@ export async function getSetDistribution(): Promise<SetDistribution[]> {
     throw new Error('Utilisateur non authentifié');
   }
 
-  const { data: stats, error: statsError } = await createServerSupabaseClient()
+  const supabase = createServerSupabaseClient();
+
+  // Récupérer l'ID Supabase de l'utilisateur
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('clerk_id', userId)
+    .single();
+
+  if (userError || !userData) {
+    console.error("Erreur lors de la récupération de l'utilisateur:", userError);
+    throw new Error('Utilisateur non trouvé dans Supabase');
+  }
+
+  const { data: stats, error: statsError } = await supabase
     .from('lego_sets')
     .select('status')
-    .eq('user_id', userId);
+    .eq('user_id', userData.id);
 
   if (statsError) {
     throw new Error('Erreur lors de la récupération de la distribution');
@@ -103,11 +136,25 @@ export async function getRecentActivity(limit = 5): Promise<RecentActivity[]> {
     throw new Error('Utilisateur non authentifié');
   }
 
+  const supabase = createServerSupabaseClient();
+
+  // Récupérer l'ID Supabase de l'utilisateur
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('id')
+    .eq('clerk_id', userId)
+    .single();
+
+  if (userError || !userData) {
+    console.error("Erreur lors de la récupération de l'utilisateur:", userError);
+    throw new Error('Utilisateur non trouvé dans Supabase');
+  }
+
   // Récupérer les dernières modifications de sets
-  const { data: setUpdates, error: setError } = await createServerSupabaseClient()
+  const { data: setUpdates, error: setError } = await supabase
     .from('lego_sets')
     .select('*')
-    .eq('user_id', userId)
+    .eq('user_id', userData.id)
     .order('last_modified', { ascending: false })
     .limit(limit);
 
@@ -116,10 +163,10 @@ export async function getRecentActivity(limit = 5): Promise<RecentActivity[]> {
   }
 
   // Récupérer les dernières modifications de pièces
-  const { data: pieceUpdates, error: pieceError } = await createServerSupabaseClient()
+  const { data: pieceUpdates, error: pieceError } = await supabase
     .from('missing_pieces')
     .select('*, lego_sets!inner(*)')
-    .eq('lego_sets.user_id', userId)
+    .eq('lego_sets.user_id', userData.id)
     .order('updated_at', { ascending: false })
     .limit(limit);
 
@@ -127,7 +174,7 @@ export async function getRecentActivity(limit = 5): Promise<RecentActivity[]> {
     throw new Error('Erreur lors de la récupération des activités de pièces');
   }
 
-  // Combiner et formater les activités
+  // Formater les activités
   const activities: RecentActivity[] = [
     ...setUpdates.map((set) => ({
       id: `set-${set.id}`,
@@ -160,9 +207,7 @@ export async function getRecentActivity(limit = 5): Promise<RecentActivity[]> {
         status: piece.status,
       },
     })),
-  ]
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-    .slice(0, limit);
+  ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  return activities;
+  return activities.slice(0, limit);
 }
