@@ -116,6 +116,17 @@ export async function updateSetStatus(
   }
 
   try {
+    // Récupérer l'ID Supabase de l'utilisateur
+    const { data: userData, error: userError } = await createServerSupabaseClient()
+      .from('users')
+      .select('id')
+      .eq('clerk_id', userId)
+      .single();
+
+    if (userError || !userData) {
+      throw new Error('Utilisateur non trouvé dans Supabase');
+    }
+
     const validatedStatus = LegoSetStatusSchema.parse(status);
 
     const { error } = await createServerSupabaseClient()
@@ -125,7 +136,7 @@ export async function updateSetStatus(
         last_modified: new Date().toISOString(),
       })
       .eq('id', setId)
-      .eq('user_id', userId);
+      .eq('user_id', userData.id);
 
     if (error) {
       console.error('Erreur Supabase:', error);
@@ -148,6 +159,17 @@ export async function updateSetNotes(setId: string, notes: string): Promise<void
   }
 
   try {
+    // Récupérer l'ID Supabase de l'utilisateur
+    const { data: userData, error: userError } = await createServerSupabaseClient()
+      .from('users')
+      .select('id')
+      .eq('clerk_id', userId)
+      .single();
+
+    if (userError || !userData) {
+      throw new Error('Utilisateur non trouvé dans Supabase');
+    }
+
     const { error } = await createServerSupabaseClient()
       .from('lego_sets')
       .update({
@@ -155,7 +177,7 @@ export async function updateSetNotes(setId: string, notes: string): Promise<void
         last_modified: new Date().toISOString(),
       })
       .eq('id', setId)
-      .eq('user_id', userId);
+      .eq('user_id', userData.id);
 
     if (error) {
       console.error('Erreur Supabase:', error);
@@ -178,6 +200,29 @@ export async function getMissingPieces(setId: string): Promise<any[]> {
   }
 
   try {
+    // Récupérer l'ID Supabase de l'utilisateur
+    const { data: userData, error: userError } = await createServerSupabaseClient()
+      .from('users')
+      .select('id')
+      .eq('clerk_id', userId)
+      .single();
+
+    if (userError || !userData) {
+      throw new Error('Utilisateur non trouvé dans Supabase');
+    }
+
+    // Vérifier que l'utilisateur possède bien le set
+    const { data: setData, error: setError } = await createServerSupabaseClient()
+      .from('lego_sets')
+      .select('id')
+      .eq('id', setId)
+      .eq('user_id', userData.id)
+      .single();
+
+    if (setError || !setData) {
+      throw new Error('Set non trouvé ou non autorisé');
+    }
+
     const { data, error } = await createServerSupabaseClient()
       .from('missing_pieces')
       .select('*')
@@ -216,12 +261,23 @@ export async function addMissingPiece(
   }
 
   try {
+    // Récupérer l'ID Supabase de l'utilisateur
+    const { data: userData, error: userError } = await createServerSupabaseClient()
+      .from('users')
+      .select('id')
+      .eq('clerk_id', userId)
+      .single();
+
+    if (userError || !userData) {
+      throw new Error('Utilisateur non trouvé dans Supabase');
+    }
+
     // Vérifier que l'utilisateur possède bien le set
     const { data: setData, error: setError } = await createServerSupabaseClient()
       .from('lego_sets')
       .select('id')
       .eq('id', setId)
-      .eq('user_id', userId)
+      .eq('user_id', userData.id)
       .single();
 
     if (setError || !setData) {
@@ -249,7 +305,7 @@ export async function addMissingPiece(
 
     revalidatePath('/collection/[id]', 'page');
   } catch (error) {
-    console.error("Erreur lors de l'ajout de la pièce:", error);
+    console.error('Erreur lors de la mise à jour:', error);
     throw error;
   }
 }
