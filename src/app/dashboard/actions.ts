@@ -131,7 +131,7 @@ export async function getRecentActivity(limit = 5): Promise<RecentActivity[]> {
   const activities: RecentActivity[] = [
     ...setUpdates.map((set) => ({
       id: `set-${set.id}`,
-      type: 'set_status',
+      type: 'set_status' as const,
       timestamp: set.last_modified,
       title: 'Set mis à jour',
       description: `${set.name} - ${
@@ -144,7 +144,7 @@ export async function getRecentActivity(limit = 5): Promise<RecentActivity[]> {
     })),
     ...pieceUpdates.map((piece) => ({
       id: `piece-${piece.id}`,
-      type: 'piece_status',
+      type: 'piece_status' as const,
       timestamp: piece.updated_at,
       title: `Pièce ${
         piece.status === 'found'
