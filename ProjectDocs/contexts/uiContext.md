@@ -1,156 +1,180 @@
-# Lego Tracker - Contexte UI
+# Contexte UI LEGO Tracker
 
 ## Principes Généraux
 
 ### Design System
 
-- Utilisation de ShadcnUI comme base
-- Palette de couleurs Lego-inspired
-- Design responsive et accessible
-- Support du mode sombre
-- Composants réutilisables
+- Utilisation de ShadCN UI comme base
+- Personnalisation via TailwindCSS
+- Composants atomiques réutilisables
+- Thème clair/sombre
 
-### Composants Principaux
+### Responsive Design
 
-#### Layout
+- Approche Mobile First
+- Breakpoints :
+  - `sm`: 640px
+  - `md`: 768px
+  - `lg`: 1024px
+  - `xl`: 1280px
+  - `2xl`: 1536px
 
-```typescript
-type LayoutProps = {
-  header: boolean; // Affichage du header
-  sidebar?: boolean; // Sidebar optionnelle
-  footer?: boolean; // Footer optionnel
-  children: React.ReactNode;
-};
-```
+### Grille
 
-#### Cards
+- Mode normal :
 
-```typescript
-type LegoSetCardProps = {
-  id: string;
-  name: string;
-  setNumber: string;
-  piecesCount: number;
-  imageUrl?: string | null;
-  status: 'mounted' | 'dismounted' | 'incomplete';
-  missingPiecesCount: number;
-};
-```
+  - Mobile : 1 colonne
+  - Tablet : 2 colonnes
+  - Desktop : 3 colonnes
+  - Large : 4 colonnes
 
-#### Modals
+- Mode compact :
+  - Mobile : 2 colonnes
+  - Tablet : 3 colonnes
+  - Desktop : 4 colonnes
+  - Large : 5 colonnes
 
-```typescript
-type SearchSetModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect: (set: RebrickableSet) => Promise<void>;
-};
-```
+## Composants
 
-#### Forms
+### Cards
 
-```typescript
-type LegoSetFormData = {
-  status: 'mounted' | 'dismounted' | 'incomplete';
-  notes?: string;
-};
-```
+- Aspect ratio 4:3 en mode normal
+- Aspect ratio 1:1 en mode compact
+- Image de couverture optimisée
+- Informations essentielles visibles
+- Actions contextuelles
 
-#### Navigation
+### Modals
 
-- Sidebar responsive
-- Navbar avec recherche
-- Breadcrumbs pour la navigation
+- Centrage vertical et horizontal
+- Fermeture par overlay
+- Animations fluides
+- Responsive sur mobile
 
-### États UI
+### Boutons
 
-```typescript
-type UIState = {
-  theme: 'light' | 'dark';
-  sidebarOpen: boolean;
-  searchOpen: boolean;
-  currentView: 'grid' | 'list';
-  filters: Filter[];
-  isLoading: boolean;
-  toast?: {
-    title: string;
-    description: string;
-    variant?: 'default' | 'destructive';
-  };
-};
-
-type Filter = {
-  type: 'status' | 'year' | 'theme';
-  value: string;
-};
-```
-
-## Responsive Breakpoints
-
-- Mobile: < 640px (sm)
-- Tablet: 640px - 1024px (md)
-- Desktop: > 1024px (lg)
-- Large Desktop: > 1280px (xl)
+- États visuels clairs
+- Feedback immédiat
+- Icons pour clarifier l'action
+- Taille adaptative
 
 ## Animations
 
-- Transitions fluides avec Framer Motion
-- Feedback visuel immédiat
-- Loading states élégants
-- Animations de cartes et modales
+### Principes
+
+- Subtiles et fonctionnelles
+- Désactivables pour l'accessibilité
+- Performance optimisée
+- Cohérence globale
+
+### Types
+
+- Transitions de page
+- Hover effects
+- Loading states
+- Feedback utilisateur
+
+## États
+
+### Loading
+
+- Skeletons animés
+- Indicateurs de progression
+- Fallbacks élégants
+- Transitions fluides
+
+### Erreurs
+
+- Messages clairs
+- Actions de correction
+- Style distinctif
+- Feedback constructif
+
+### Succès
+
+- Confirmations visuelles
+- Animations subtiles
+- Durée appropriée
+- Actions suivantes claires
 
 ## Accessibilité
 
-- Support WCAG 2.1
+### Standards
+
+- WCAG 2.1 AA
+- Contraste suffisant
 - Navigation au clavier
 - Support lecteur d'écran
-- Contraste suffisant
-- Messages d'erreur explicites
-- Formulaires accessibles
+
+### Adaptations
+
+- Taille de texte ajustable
+- Animations réduites
+- Alt text pour images
+- ARIA labels
 
 ## Performance
 
-- Images optimisées avec Next/Image
-- Lazy loading des composants
-- Code splitting automatique
-- Prefetching stratégique
-- Optimisation des requêtes API
-- Mise en cache appropriée
+### Optimisations
 
-## Gestion des Erreurs
+- Images optimisées
+- Code splitting
+- Lazy loading
+- Prefetching
 
-- Messages d'erreur contextuels
-- Fallbacks pour les images
-- États de chargement
-- Gestion des erreurs réseau
-- Validation des formulaires
+### Métriques
 
-## Composants Partagés
+- LCP < 2.5s
+- FID < 100ms
+- CLS < 0.1
+- TTI < 3.8s
 
-### UI de Base
+## Thèmes
 
-- Button
-- Card
-- Dialog
-- Form
-- Input
-- Label
-- Textarea
-- Toast
-- Toaster
+### Clair
 
-### Composants Métier
+```css
+--background: 0 0% 100%;
+--foreground: 222.2 84% 4.9%;
+--card: 0 0% 100%;
+--card-foreground: 222.2 84% 4.9%;
+--popover: 0 0% 100%;
+--popover-foreground: 222.2 84% 4.9%;
+--primary: 222.2 47.4% 11.2%;
+--primary-foreground: 210 40% 98%;
+--secondary: 210 40% 96.1%;
+--secondary-foreground: 222.2 47.4% 11.2%;
+--muted: 210 40% 96.1%;
+--muted-foreground: 215.4 16.3% 46.9%;
+--accent: 210 40% 96.1%;
+--accent-foreground: 222.2 47.4% 11.2%;
+--destructive: 0 84.2% 60.2%;
+--destructive-foreground: 210 40% 98%;
+--border: 214.3 31.8% 91.4%;
+--input: 214.3 31.8% 91.4%;
+--ring: 222.2 84% 4.9%;
+```
 
-- LegoSetCard
-- LegoSetForm
-- SearchSetModal
-- MissingPieceCard (à venir)
-- StatisticsCard (à venir)
+### Sombre
 
-## Patterns d'Interaction
-
-- Recherche avec debounce
-- Validation en temps réel
-- Feedback immédiat
-- Confirmation des actions importantes
-- Navigation intuitive
+```css
+--background: 222.2 84% 4.9%;
+--foreground: 210 40% 98%;
+--card: 222.2 84% 4.9%;
+--card-foreground: 210 40% 98%;
+--popover: 222.2 84% 4.9%;
+--popover-foreground: 210 40% 98%;
+--primary: 210 40% 98%;
+--primary-foreground: 222.2 47.4% 11.2%;
+--secondary: 217.2 32.6% 17.5%;
+--secondary-foreground: 210 40% 98%;
+--muted: 217.2 32.6% 17.5%;
+--muted-foreground: 215 20.2% 65.1%;
+--accent: 217.2 32.6% 17.5%;
+--accent-foreground: 210 40% 98%;
+--destructive: 0 62.8% 30.6%;
+--destructive-foreground: 210 40% 98%;
+--border: 217.2 32.6% 17.5%;
+--input: 217.2 32.6% 17.5%;
+--ring: 212.7 26.8% 83.9%;
+```
