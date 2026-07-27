@@ -1,6 +1,6 @@
 # 🧱 LEGO Tracker
 
-Application web moderne pour gérer et partager votre collection LEGO
+Application web moderne pour gérer et partager votre collection LEGO (Le projet n'est plus maintenu)
 
 ## ✨ Fonctionnalités
 
