@@ -27,7 +27,7 @@ Application web moderne pour gérer et partager votre collection LEGO (Le projet
 1. Cloner le repo :
 
 ```bash
-git clone https://github.com/votre-username/lego-tracker.git
+git clone https://github.com/thomaslekieffre/lego-tracker.git
 cd lego-tracker
 ```
 
